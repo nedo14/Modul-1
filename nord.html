@@ -1,0 +1,1710 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<script>window.CR_CONFIG = { url: "https://oaquvarnbytnrmdsyrwo.supabase.co", key: "sb_publishable_S6zpQtrEJWY0c92KMQUDBQ_p5NkfYOc" };</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#172d40">
+<link rel="manifest" href="manifest-nord.webmanifest">
+<link rel="icon" type="image/png" href="icon-nord-192.png">
+<link rel="apple-touch-icon" href="icon-nord-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Raspored kontejnera – NORD</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+margin: 0;
+padding: 8px;
+font-family: Arial, sans-serif;
+background: #e8eef2;
+color: #172d40;
+}
+
+header { text-align: center; padding: 10px 4px; }
+h1 { margin: 0 0 10px; font-size: 23px; }
+
+.stats {
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 5px;
+margin-bottom: 10px;
+}
+
+.stat {
+background: white;
+border-radius: 7px;
+padding: 7px 2px;
+text-align: center;
+border: 1px solid #ccd5dc;
+}
+
+.stat strong { display: block; font-size: 20px; }
+.stat span { font-size: 11px; }
+
+.actions { display: flex; gap: 7px; margin-bottom: 10px; }
+
+button {
+font-size: 14px;
+font-weight: bold;
+border: 0;
+border-radius: 7px;
+padding: 10px;
+cursor: pointer;
+}
+
+.actions button {
+flex: 1;
+background: #244c68;
+color: white;
+}
+
+.table-wrap {
+width: 100%;
+overflow: hidden;
+background: white;
+border-radius: 7px;
+border: 1px solid #bac7d0;
+}
+
+table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+
+th, td {
+border: 1px solid #c4cdd4;
+text-align: center;
+padding: 2px;
+}
+
+thead th {
+background: #244c68;
+color: white;
+height: 34px;
+font-size: 13px;
+}
+
+th.hp-head { width: 13%; }
+th.sp-head { width: 15%; }
+th.slot-head { width: 36%; }
+
+.hp {
+background: #dce5eb;
+font-size: 15px;
+font-weight: bold;
+}
+
+.sp {
+background: #edf2f5;
+font-size: 13px;
+font-weight: bold;
+}
+
+td.position-cell { height: 39px; padding: 2px; }
+
+/* POLJA KONTEJNERA - ZAŠTITA OD MENIJA NA TABLETU */
+
+.position {
+position: relative;
+height: 34px;
+width: 100%;
+overflow: hidden;
+border: 1px solid #84949e;
+border-radius: 4px;
+background: #ffffff;
+color: #172d40;
+
+touch-action: manipulation;
+user-select: none;
+-webkit-user-select: none;
+-webkit-touch-callout: none;
+-webkit-tap-highlight-color: transparent;
+-webkit-user-drag: none;
+}
+
+.position.empty { background: #ffffff; }
+
+.position .fill {
+position: absolute;
+left: 0;
+top: 0;
+bottom: 0;
+background: transparent;
+z-index: 1;
+pointer-events: none;
+}
+
+.position .inside {
+position: absolute;
+inset: 0;
+z-index: 2;
+display: flex;
+flex-direction: row;
+align-items: center;
+justify-content: center;
+padding: 1px 22px 1px 3px;
+pointer-events: none;
+overflow: hidden;
+}
+.position .label {
+font-family: "Arial Black", Arial, sans-serif;
+font-weight: 1000;
+white-space: nowrap;
+line-height: 1;
+text-align: center;
+color: #000000;
+-webkit-text-stroke: 0.45px #000000;
+text-shadow: none;
+letter-spacing: 0;
+}
+.position .count {
+position: absolute;
+right: 2px;
+top: 50%;
+transform: translateY(-50%);
+font-family: "Arial Black", Arial, sans-serif;
+font-size: 10px;
+font-weight: 1000;
+z-index: 3;
+color: #000000;
+-webkit-text-stroke: 0.4px #000000;
+text-shadow: none;
+pointer-events: none;
+}
+.position.full .fill { width: 100% !important; }
+
+.hint {
+font-size: 11px;
+text-align: center;
+color: #52616b;
+margin: 8px 0 16px;
+}
+
+.summary-title {
+text-align: center;
+font-size: 17px;
+font-weight: bold;
+margin: 18px 0 8px;
+}
+
+.summary-wrap {
+width: 100%;
+background: white;
+border: 1px solid #bac7d0;
+border-radius: 8px;
+overflow: hidden;
+margin-bottom: 20px;
+}
+
+.summary-table th {
+background: #244c68;
+color: white;
+padding: 10px 5px;
+font-size: 14px;
+}
+
+.summary-table td {
+padding: 9px 5px;
+font-size: 15px;
+font-weight: bold;
+}
+
+.summary-table .number { font-size: 17px; }
+.summary-table .time { font-size: 15px; color: #244c68; }
+
+.summary-table .total-row td {
+background: #dce5eb;
+font-size: 16px;
+font-weight: 900;
+}
+
+.driver-choice-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 8px;
+}
+
+.driver-choice {
+min-height: 49px;
+background: #e3ebf0;
+color: #172d40;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 8px;
+padding: 10px 6px;
+}
+
+.driver-choice:active { background: #244c68; color: white; }
+.driver-name { font-size: 17px; font-weight: 900; }
+.driver-time { font-size: 11px; font-weight: normal; color: #52616b; }
+.driver-choice:active .driver-time { color: white; }
+
+dialog {
+width: min(92%, 390px);
+border: 0;
+border-radius: 12px;
+padding: 18px;
+box-shadow: 0 5px 30px #0005;
+}
+
+dialog::backdrop { background: #0008; }
+dialog h2 { margin: 0 0 12px; font-size: 20px; text-align: center; }
+.dialog-section { margin: 14px 0; }
+.dialog-section p { font-weight: bold; margin: 0 0 8px; }
+
+.choice-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 8px;
+}
+
+.choice-grid button {
+background: #e3ebf0;
+color: #172d40;
+min-height: 48px;
+font-size: 16px;
+}
+
+.choice-grid button.chosen { background: #244c68; color: white; }
+
+/* KALENDAR */
+
+.calendar {
+background: #f3f6f8;
+border: 1px solid #cbd5dc;
+border-radius: 9px;
+padding: 10px;
+}
+
+.calendar-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 8px;
+margin-bottom: 12px;
+}
+
+.calendar-header button {
+width: 42px;
+height: 40px;
+padding: 5px;
+background: #244c68;
+color: white;
+font-size: 20px;
+}
+
+.calendar-month { font-size: 16px; font-weight: bold; text-align: center; flex: 1; }
+
+.calendar-grid {
+display: grid;
+grid-template-columns: repeat(7, 1fr);
+gap: 4px;
+}
+
+.calendar-weekday {
+text-align: center;
+font-size: 11px;
+font-weight: bold;
+padding: 6px 0;
+color: #52616b;
+}
+
+.calendar-day {
+min-width: 0;
+height: 39px;
+padding: 0;
+background: white;
+border: 1px solid #d2dbe1;
+color: #172d40;
+font-size: 14px;
+}
+
+.calendar-day.today { border: 2px solid #244c68; }
+.calendar-day:active { background: #244c68; color: white; }
+.calendar-empty { height: 39px; }
+
+.calendar-note {
+text-align: center;
+font-size: 11px;
+color: #52616b;
+margin-top: 10px;
+}
+
+.dialog-buttons { display: flex; gap: 8px; margin-top: 16px; }
+.dialog-buttons button { flex: 1; }
+.cancel { background: #dce3e8; color: #172d40; }
+
+#message {
+position: fixed;
+bottom: 18px;
+left: 50%;
+transform: translateX(-50%);
+background: #172d40;
+color: white;
+padding: 11px 18px;
+border-radius: 8px;
+font-size: 14px;
+display: none;
+z-index: 20;
+text-align: center;
+}
+
+@media (max-width: 380px) {
+body { padding: 4px; }
+h1 { font-size: 19px; }
+.stat strong { font-size: 17px; }
+.stat span { font-size: 9px; }
+td.position-cell { height: 35px; }
+.position { height: 30px; }
+}
+
+/* GESAMT: dvije tabele jedna pored druge */
+.tables { display: block; }
+.table-col { min-width: 0; }
+.gesamt-cap { display: none; }
+.tables.gesamt { display: flex; gap: 5px; align-items: flex-start; }
+.tables.gesamt .table-col { flex: 1 1 0; }
+.tables.gesamt .gesamt-cap {
+display: block;
+text-align: center;
+font-size: 12px;
+font-weight: bold;
+margin: 0 0 3px;
+}
+.tables.gesamt thead th { font-size: 12px; height: 30px; }
+.tables.gesamt .hp { font-size: 13px; }
+.tables.gesamt .sp { font-size: 11px; }
+.tables.gesamt td.position-cell { padding: 1px; }
+.tables.gesamt th, .tables.gesamt td { padding: 1px; }
+body.gesamt-mode { padding: 4px; }
+
+/* ===== SISTEM: prijava, traka, paneli ===== */
+#message { z-index: 3000; }
+#sysBar {
+display: none;
+align-items: center;
+justify-content: space-between;
+gap: 8px;
+background: #172d40;
+color: white;
+border-radius: 7px;
+padding: 6px 8px;
+margin-bottom: 6px;
+font-size: 13px;
+font-weight: bold;
+}
+#sysBar #sysUser { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#sysBar #sysClock { white-space: nowrap; font-variant-numeric: tabular-nums; }
+#sysBar button { background: #b3392f; color: white; padding: 6px 12px; font-size: 13px; }
+.actions { flex-wrap: wrap; }
+.actions button { min-width: 110px; }
+#adminBtn { background: #8a5a00 !important; }
+
+#loginOverlay {
+position: fixed; inset: 0; z-index: 1500; background: #172d40;
+display: flex; align-items: center; justify-content: center; padding: 12px; overflow: auto;
+}
+.login-card {
+background: white; border-radius: 12px; padding: 20px; width: 100%; max-width: 380px;
+display: flex; flex-direction: column; gap: 10px;
+}
+.login-card h2 { margin: 0; font-size: 19px; text-align: center; }
+.login-clock { text-align: center; font-size: 22px; font-weight: bold; color: #244c68; font-variant-numeric: tabular-nums; }
+.login-card p { margin: 0; font-size: 14px; }
+.login-err { color: #b3392f; font-size: 13px; font-weight: bold; min-height: 1px; }
+
+#sysPanel { position: fixed; inset: 0; z-index: 1000; background: #e8eef2; overflow: auto; }
+.sys-head {
+position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center;
+background: #244c68; color: white; padding: 8px 10px; font-size: 16px;
+}
+.sys-body { padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+.sys-btn { background: #244c68; color: white; padding: 8px 12px; font-size: 13px; }
+.sys-close { background: #172d40; }
+.sys-primary { background: #1f7a3d; }
+.sys-tabs { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+.sys-tab { background: #5d7a8f; }
+.sys-tab.on { background: #172d40; }
+.sys-input {
+width: 100%; font-size: 14px; padding: 9px; border: 1px solid #98a8b3; border-radius: 6px;
+background: white; color: #172d40; font-family: Arial, sans-serif;
+}
+.sys-mini { padding: 4px; font-size: 12px; width: auto; }
+.sys-card { background: white; border: 1px solid #ccd5dc; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+.sys-check { font-size: 14px; display: flex; gap: 6px; align-items: center; }
+.sys-row { display: flex; gap: 6px; }
+.sys-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.sys-filters .sys-input { width: auto; flex: 1 1 130px; }
+.sys-filters label { font-size: 13px; display: flex; align-items: center; gap: 4px; }
+.sys-note { font-size: 12px; color: #4b6376; margin: 4px 0; }
+.sys-h3 { margin: 10px 0 2px; font-size: 14px; }
+.sys-scroll { overflow-x: auto; background: white; border-radius: 7px; border: 1px solid #bac7d0; }
+.sys-table { width: 100%; border-collapse: collapse; table-layout: auto; font-size: 12px; }
+.sys-table th { background: #244c68; color: white; padding: 5px; height: auto; font-size: 12px; text-align: left; }
+.sys-table td { border: 1px solid #d3dbe0; padding: 4px 5px; text-align: left; vertical-align: top; }
+.sys-empty { text-align: center !important; color: #6a7f8f; }
+.sys-actions { display: flex; flex-wrap: wrap; gap: 4px; }
+.sys-actions .sys-btn { padding: 5px 8px; font-size: 11px; }
+
+/* ===== SERVER: veza i upozorenja ===== */
+#netBanner {
+display: none; background: #b3392f; color: white; font-weight: bold; font-size: 13px;
+text-align: center; padding: 7px 8px; border-radius: 7px; margin-bottom: 6px;
+}
+#sysNet { font-size: 14px; }
+#sysNet.on { color: #5fe08a; }
+#sysNet.off { color: #ff6b5e; }
+.tables.stale { opacity: 0.55; }
+.sys-link { background: transparent; color: #244c68; text-decoration: underline; padding: 4px; font-size: 12px; }
+</style>
+</head>
+
+<body>
+
+<div id="sysBar"><span id="sysNet" class="off">●</span><span id="sysUser"></span><span id="sysClock"></span><button type="button" id="sysLogout">Odjava</button></div>
+<div id="netBanner"></div>
+
+<header>
+<h1>RASPORED KONTEJNERA</h1>
+
+<div class="stats">
+<div class="stat"><strong id="totalPositions">60</strong><span>Broj pozicija</span></div>
+<div class="stat"><strong id="occupiedPositions">0</strong><span>Zauzeto</span></div>
+<div class="stat"><strong id="freePositions">60</strong><span>Slobodno</span></div>
+<div class="stat"><strong id="totalContainers">0</strong><span>Kontejnera</span></div>
+</div>
+
+<div class="actions">
+<button onclick="exportBackup()">Sačuvaj kopiju</button>
+<button onclick="document.getElementById('backupFile').click()">Učitaj kopiju</button>
+<button id="gesamtBtn" onclick="toggleGesamt()">GESAMT</button>
+<button id="histBtn" type="button">Historija</button>
+<button id="adminBtn" type="button" style="display:none">ADMINISTRATOR</button>
+<input id="backupFile" type="file" accept=".json,application/json"
+style="display:none" onchange="importBackup(event)">
+</div>
+</header>
+
+<div id="tables" class="tables"></div>
+
+<div class="hint">
+Dodir na prazno polje = novi unos. Dodir na zauzeto = dodaj kontejner.
+Drži polje 2 sekunde za brisanje.
+</div>
+
+<div class="summary-title">BROJ KONTEJNERA PO VOZU</div>
+
+<div class="summary-wrap">
+<table class="summary-table">
+<thead>
+<tr><th>Voz</th><th>Vrijeme</th><th>Broj kontejnera</th></tr>
+</thead>
+<tbody id="driverSummary"></tbody>
+<tfoot>
+<tr class="total-row">
+<td colspan="2">UKUPNO</td>
+<td class="number" id="driverGrandTotal">0</td>
+</tr>
+</tfoot>
+</table>
+</div>
+
+<dialog id="entryDialog">
+<h2 id="dialogTitle">Nova pozicija</h2>
+
+<div class="dialog-section" id="sizeSection">
+<p>Izaberi veličinu kontejnera:</p>
+<div class="choice-grid" id="sizeChoices">
+<button type="button" onclick="chooseSize(20)">20 stopa</button>
+<button type="button" onclick="chooseSize(40)">40 stopa</button>
+</div>
+</div>
+
+<div class="dialog-section" id="driverSection" style="display:none">
+<p>Izaberi vozača:</p>
+<div class="driver-choice-grid" id="driverChoiceGrid"></div>
+</div>
+
+<div class="dialog-section" id="dateSection" style="display:none">
+<p>Izaberi datum:</p>
+<div class="calendar">
+<div class="calendar-header">
+<button type="button" onclick="changeMonth(-1)">‹</button>
+<div class="calendar-month" id="calendarMonth"></div>
+<button type="button" onclick="changeMonth(1)">›</button>
+</div>
+<div class="calendar-grid" id="calendarGrid"></div>
+<div class="calendar-note">Dodirni datum i kontejner će se odmah memorisati.</div>
+</div>
+</div>
+
+<div class="dialog-buttons">
+<button class="cancel" type="button" onclick="closeDialog()">Odustani</button>
+</div>
+</dialog>
+
+<div id="message"></div>
+
+<script>
+
+"use strict";
+
+const STORAGE_KEY = "containerRoster_v2";
+const PROGRAM_LABEL = "NORD";
+const RANGE_FROM = 1;
+const RANGE_TO = 30;
+const ALL_RANGES = [["NORD", 1, 30], ["SÜD", 31, 58]];
+
+// Svi izbori za unos; Eingang se namjerno ne prikazuje u donjoj statistici.
+const drivers = ["N1", "N2", "BHV", "IGS", "NM", "MAS", "Eingang"];
+const summaryDrivers = ["N1", "N2", "BHV", "IGS", "NM", "MAS"];
+
+const driverColors = {
+"N1": "#2878C8",
+"N2": "#D97706",
+"BHV": "#8B5CF6",
+"IGS": "#0891B2",
+"NM": "#16A34A",
+"MAS": "#DB2777",
+"Eingang": "#475569"
+};
+
+const driverTimes = {
+"NM": "12:52",
+"N1": "02:30",
+"N2": "13:00",
+"BHV": "—",
+"IGS": "—",
+"MAS": "—",
+"Eingang": "—"
+};
+
+const monthNames = [
+"Januar", "Februar", "Mart", "April", "Maj", "Juni",
+"Juli", "August", "Septembar", "Oktobar", "Novembar", "Decembar"
+];
+
+const weekdays = ["Pon", "Uto", "Sri", "Čet", "Pet", "Sub", "Ned"];
+
+let data = {};
+let gesamt = false;
+let selectedPosition = null;
+let selectedSize = null;
+let selectedDriver = null;
+let calendarYear = new Date().getFullYear();
+let calendarMonth = new Date().getMonth();
+
+function positionKey(row, sp) {
+return row + "-" + sp;
+}
+
+
+function visibleRanges() {
+return gesamt ? ALL_RANGES : [[PROGRAM_LABEL, RANGE_FROM, RANGE_TO]];
+}
+
+function isVisibleKey(key) {
+const sp = Number(String(key).split("-")[1]);
+return visibleRanges().some(r => sp >= r[1] && sp <= r[2]);
+}
+
+// Provjera podataka: odbacuje neispravne zapise (npr. iz pogrešne kopije).
+function sanitizeData(source) {
+if (!source || typeof source !== "object" || Array.isArray(source)) return null;
+const out = {};
+Object.keys(source).forEach(key => {
+const m = /^([AB])-(\d+)$/.exec(key);
+if (!m) return;
+const sp = Number(m[2]);
+if (sp < 1 || sp > 58) return;
+const item = source[key];
+if (!item || typeof item !== "object") return;
+const size = Number(item.size);
+if (size !== 20 && size !== 40) return;
+if (drivers.indexOf(item.driver) === -1) return;
+const max = size === 20 ? 6 : 3;
+let count = Math.round(Number(item.count));
+if (!(count >= 1)) return;
+if (count > max) count = max;
+out[key] = { size: size, driver: item.driver, date: String(item.date || ""), count: count, max: max };
+});
+return out;
+}
+
+function loadData() {
+try {
+const saved = localStorage.getItem(STORAGE_KEY);
+if (saved) {
+const clean = sanitizeData(JSON.parse(saved));
+if (clean) data = clean;
+}
+} catch (error) {
+data = {};
+showMessage("Nije moguće učitati sačuvane podatke.");
+}
+}
+
+function saveData() {
+try {
+localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+updateStats();
+} catch (error) {
+showMessage("Greška pri čuvanju podataka.");
+}
+}
+
+function buildTables() {
+const host = document.getElementById("tables");
+host.innerHTML = "";
+host.className = "tables" + (gesamt ? " gesamt" : "");
+document.body.classList.toggle("gesamt-mode", gesamt);
+
+visibleRanges().forEach(range => {
+const label = range[0], from = range[1], to = range[2];
+const col = document.createElement("div");
+col.className = "table-col";
+
+const cap = document.createElement("div");
+cap.className = "gesamt-cap";
+cap.textContent = label + " " + from + "–" + to;
+col.appendChild(cap);
+
+const wrap = document.createElement("div");
+wrap.className = "table-wrap";
+const table = document.createElement("table");
+table.innerHTML =
+'<thead><tr>' +
+'<th class="hp-head">HP</th><th class="sp-head">SP</th>' +
+'<th class="slot-head">A</th><th class="slot-head">B</th>' +
+'</tr></thead>';
+const body = document.createElement("tbody");
+
+for (let sp = from; sp <= to; sp++) {
+const hp = 1 + Math.floor((sp - 1) / 2);
+const tr = document.createElement("tr");
+
+if (sp % 2 === 1) {
+const hpCell = document.createElement("td");
+hpCell.className = "hp";
+hpCell.rowSpan = 2;
+hpCell.textContent = hp;
+tr.appendChild(hpCell);
+}
+
+const spCell = document.createElement("td");
+spCell.className = "sp";
+spCell.textContent = sp;
+tr.appendChild(spCell);
+
+["A", "B"].forEach(row => {
+const td = document.createElement("td");
+td.className = "position-cell";
+
+const key = positionKey(row, sp);
+const box = document.createElement("div");
+box.className = "position empty";
+box.dataset.key = key;
+box.dataset.row = row;
+box.dataset.sp = sp;
+
+box.innerHTML =
+'<div class="fill" style="width:0%"></div>' +
+'<div class="inside"></div>';
+
+addPositionEvents(box);
+td.appendChild(box);
+tr.appendChild(td);
+});
+
+body.appendChild(tr);
+}
+
+table.appendChild(body);
+wrap.appendChild(table);
+col.appendChild(wrap);
+host.appendChild(col);
+});
+
+document.getElementById("gesamtBtn").textContent = gesamt ? ("Nazad na " + PROGRAM_LABEL) : "GESAMT";
+renderAll();
+}
+
+function toggleGesamt() {
+closeDialog();
+gesamt = !gesamt;
+buildTables();
+}
+
+function addPositionEvents(box) {
+let longPressTriggered = false;
+let longPressTimer = null;
+let pointerStart = null;
+
+// Sprečava Android/iPad meni koji se otvara dugim pritiskom.
+box.addEventListener("contextmenu", function(event) {
+event.preventDefault();
+event.stopPropagation();
+return false;
+});
+
+box.addEventListener("pointerdown", function(event) {
+if (event.button !== undefined && event.button !== 0) return;
+
+longPressTriggered = false;
+pointerStart = { x: event.clientX, y: event.clientY };
+
+clearTimeout(longPressTimer);
+
+if (data[box.dataset.key]) {
+longPressTimer = setTimeout(() => {
+longPressTriggered = true;
+
+delete data[box.dataset.key];
+saveData();
+renderPosition(box.dataset.key);
+
+showMessage("Pozicija je obrisana.");
+}, 2000);
+}
+});
+
+box.addEventListener("pointermove", function(event) {
+if (!pointerStart) return;
+
+const dx = Math.abs(event.clientX - pointerStart.x);
+const dy = Math.abs(event.clientY - pointerStart.y);
+
+if (dx > 12 || dy > 12) {
+clearTimeout(longPressTimer);
+}
+});
+
+["pointerup", "pointerleave", "pointercancel"].forEach(name => {
+box.addEventListener(name, function() {
+clearTimeout(longPressTimer);
+pointerStart = null;
+});
+});
+
+box.addEventListener("click", function(event) {
+event.preventDefault();
+
+if (longPressTriggered) {
+longPressTriggered = false;
+return;
+}
+
+handlePosition(box.dataset.key, box.dataset.row, box.dataset.sp);
+});
+}
+
+function handlePosition(key, row, sp) {
+const item = data[key];
+
+if (!item) {
+openDialog(row, sp);
+return;
+}
+
+if (item.count >= item.max) {
+showMessage("Ova pozicija je potpuno popunjena.");
+return;
+}
+
+item.count++;
+saveData();
+renderPosition(key);
+}
+
+function openDialog(row, sp) {
+selectedPosition = {
+key: positionKey(row, sp),
+row: row,
+sp: Number(sp)
+};
+
+selectedSize = null;
+selectedDriver = null;
+
+document.getElementById("dialogTitle").textContent =
+"SP " + sp + " — red " + row;
+
+document.getElementById("sizeSection").style.display = "block";
+document.getElementById("driverSection").style.display = "none";
+document.getElementById("dateSection").style.display = "none";
+
+const sizeChoices = document.getElementById("sizeChoices");
+
+if (row === "B") {
+sizeChoices.innerHTML =
+'<button type="button" class="chosen" onclick="chooseSize(40)">40 stopa</button>';
+chooseSize(40);
+} else {
+sizeChoices.innerHTML =
+'<button type="button" onclick="chooseSize(20)">20 stopa</button>' +
+'<button type="button" onclick="chooseSize(40)">40 stopa</button>';
+}
+
+document.getElementById("entryDialog").showModal();
+}
+
+function buildDriverChoices() {
+const grid = document.getElementById("driverChoiceGrid");
+grid.innerHTML = "";
+
+drivers.forEach(driver => {
+const button = document.createElement("button");
+button.type = "button";
+button.className = "driver-choice";
+button.style.backgroundColor = driverColors[driver];
+button.style.color = "#ffffff";
+button.onclick = () => chooseDriver(driver);
+
+const name = document.createElement("span");
+name.className = "driver-name";
+name.textContent = driver;
+
+const time = document.createElement("span");
+time.className = "driver-time";
+time.textContent = driverTimes[driver];
+time.style.color = "#ffffff";
+
+button.appendChild(name);
+button.appendChild(time);
+grid.appendChild(button);
+});
+}
+
+function chooseSize(size) {
+selectedSize = size;
+document.getElementById("sizeSection").style.display = "none";
+document.getElementById("driverSection").style.display = "block";
+document.getElementById("dateSection").style.display = "none";
+}
+
+function chooseDriver(driver) {
+selectedDriver = driver;
+
+document.getElementById("driverSection").style.display = "none";
+document.getElementById("dateSection").style.display = "block";
+
+const now = new Date();
+calendarYear = now.getFullYear();
+calendarMonth = now.getMonth();
+
+renderCalendar();
+}
+
+function renderCalendar() {
+const title = document.getElementById("calendarMonth");
+const grid = document.getElementById("calendarGrid");
+
+title.textContent = monthNames[calendarMonth] + " " + calendarYear;
+grid.innerHTML = "";
+
+weekdays.forEach(day => {
+const cell = document.createElement("div");
+cell.className = "calendar-weekday";
+cell.textContent = day;
+grid.appendChild(cell);
+});
+
+const firstDay = new Date(calendarYear, calendarMonth, 1);
+let offset = firstDay.getDay() - 1;
+if (offset < 0) offset = 6;
+
+const daysInMonth = new Date(
+calendarYear, calendarMonth + 1, 0
+).getDate();
+
+for (let i = 0; i < offset; i++) {
+const empty = document.createElement("div");
+empty.className = "calendar-empty";
+grid.appendChild(empty);
+}
+
+const today = new Date();
+
+for (let day = 1; day <= daysInMonth; day++) {
+const button = document.createElement("button");
+button.type = "button";
+button.className = "calendar-day";
+button.textContent = day;
+
+if (
+day === today.getDate() &&
+calendarMonth === today.getMonth() &&
+calendarYear === today.getFullYear()
+) {
+button.classList.add("today");
+}
+
+button.addEventListener("click", function() {
+selectCalendarDate(calendarYear, calendarMonth, day);
+});
+
+grid.appendChild(button);
+}
+}
+
+function changeMonth(direction) {
+calendarMonth += direction;
+
+if (calendarMonth < 0) {
+calendarMonth = 11;
+calendarYear--;
+} else if (calendarMonth > 11) {
+calendarMonth = 0;
+calendarYear++;
+}
+
+renderCalendar();
+}
+
+function selectCalendarDate(year, month, day) {
+const dateValue =
+year + "-" +
+String(month + 1).padStart(2, "0") + "-" +
+String(day).padStart(2, "0");
+
+acceptDate(dateValue);
+}
+
+function acceptDate(dateValue) {
+if (!dateValue || !selectedPosition || !selectedSize || !selectedDriver) {
+return;
+}
+
+const max = selectedSize === 20 ? 6 : 3;
+
+data[selectedPosition.key] = {
+size: selectedSize,
+driver: selectedDriver,
+date: dateValue,
+count: 1,
+max: max
+};
+
+saveData();
+renderPosition(selectedPosition.key);
+closeDialog();
+showMessage("Kontejner je automatski memorisan.");
+}
+
+function closeDialog() {
+const dialog = document.getElementById("entryDialog");
+if (dialog.open) dialog.close();
+}
+
+function formatDate(dateString) {
+if (!dateString) return "";
+const parts = dateString.split("-");
+return parts[2] + "." + parts[1] + ".";
+}
+
+
+// Naziv voza i datum u jednom redu, što veći font koji stane u polje.
+function fitLabel(box) {
+const label = box.querySelector(".label");
+const inside = box.querySelector(".inside");
+if (!label || !inside) return;
+const cs = getComputedStyle(inside);
+const availW = inside.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+const availH = inside.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+if (availW <= 0 || availH <= 0) return;
+let size = availH * 0.98;
+label.style.fontSize = size + "px";
+const w = label.offsetWidth;
+if (w > availW) {
+size = Math.floor(size * availW / w * 0.97 * 2) / 2;
+label.style.fontSize = Math.max(size, 6) + "px";
+}
+}
+
+function fitAll() {
+document.querySelectorAll(".position").forEach(fitLabel);
+}
+
+function renderPosition(key) {
+const box = document.querySelector('.position[data-key="' + key + '"]');
+
+if (!box) return;
+
+const item = data[key];
+
+if (!item) {
+box.className = "position empty";
+box.style.backgroundColor = "#ffffff";
+box.querySelector(".fill").style.backgroundColor = "transparent";
+box.querySelector(".fill").style.width = "0%";
+box.querySelector(".inside").innerHTML = "";
+
+const oldCount = box.querySelector(".count");
+if (oldCount) oldCount.remove();
+
+return;
+}
+
+const percentage = Math.min(100, (item.count / item.max) * 100);
+
+box.className = "position" + (item.count >= item.max ? " full" : "");
+box.style.backgroundColor = "#ffffff";
+box.querySelector(".fill").style.backgroundColor = driverColors[item.driver] || "#475569";
+box.querySelector(".fill").style.width = percentage + "%";
+
+const inside = box.querySelector(".inside");
+inside.innerHTML = "";
+const label = document.createElement("span");
+label.className = "label";
+label.textContent = item.driver + " \u2013 " + formatDate(item.date);
+inside.appendChild(label);
+
+let count = box.querySelector(".count");
+
+if (!count) {
+count = document.createElement("span");
+count.className = "count";
+box.appendChild(count);
+}
+
+count.textContent = item.count + "/" + item.max;
+fitLabel(box);
+}
+
+function renderAll() {
+document.querySelectorAll(".position").forEach(box => {
+renderPosition(box.dataset.key);
+});
+
+updateStats();
+requestAnimationFrame(fitAll);
+}
+
+function updateStats() {
+let occupied = 0;
+let containers = 0;
+const driverCounts = {};
+
+summaryDrivers.forEach(driver => {
+driverCounts[driver] = 0;
+});
+
+Object.keys(data).forEach(key => {
+const item = data[key];
+if (item && item.count > 0 && isVisibleKey(key)) {
+occupied++;
+
+const amount = Number(item.count) || 0;
+containers += amount;
+
+if (driverCounts[item.driver] !== undefined) {
+driverCounts[item.driver] += amount;
+}
+}
+});
+
+let totalPositions = 0;
+visibleRanges().forEach(r => { totalPositions += (r[2] - r[1] + 1) * 2; });
+
+document.getElementById("totalPositions").textContent = totalPositions;
+document.getElementById("occupiedPositions").textContent = occupied;
+document.getElementById("freePositions").textContent = totalPositions - occupied;
+document.getElementById("totalContainers").textContent = containers;
+
+const summary = document.getElementById("driverSummary");
+summary.innerHTML = "";
+
+summaryDrivers.forEach(driver => {
+const tr = document.createElement("tr");
+
+const nameCell = document.createElement("td");
+nameCell.textContent = driver;
+nameCell.style.color = driverColors[driver];
+
+const timeCell = document.createElement("td");
+timeCell.className = "time";
+timeCell.textContent = driverTimes[driver];
+
+const numberCell = document.createElement("td");
+numberCell.className = "number";
+numberCell.textContent = driverCounts[driver];
+
+tr.appendChild(nameCell);
+tr.appendChild(timeCell);
+tr.appendChild(numberCell);
+summary.appendChild(tr);
+});
+
+document.getElementById("driverGrandTotal").textContent = containers;
+}
+
+function showMessage(message) {
+const element = document.getElementById("message");
+element.textContent = message;
+element.style.display = "block";
+
+clearTimeout(showMessage.timer);
+showMessage.timer = setTimeout(() => {
+element.style.display = "none";
+}, 2300);
+}
+
+function exportBackup() {
+const backup = {
+app: "Raspored kontejnera",
+version: 3,
+program: PROGRAM_LABEL,
+savedAt: new Date().toISOString(),
+data: data
+};
+
+const blob = new Blob(
+[JSON.stringify(backup, null, 2)],
+{ type: "application/json" }
+);
+
+const url = URL.createObjectURL(blob);
+const link = document.createElement("a");
+link.href = url;
+link.download = "kopija-kontejneri-" + PROGRAM_LABEL + ".json";
+document.body.appendChild(link);
+link.click();
+link.remove();
+URL.revokeObjectURL(url);
+
+showMessage("Rezervna kopija je pripremljena.");
+}
+
+function importBackup(event) {
+const file = event.target.files[0];
+if (!file) return;
+
+const reader = new FileReader();
+
+reader.onload = function() {
+try {
+const parsed = JSON.parse(reader.result);
+const restored = sanitizeData(parsed.data || parsed);
+
+if (!restored) {
+throw new Error("Neispravna kopija");
+}
+
+data = restored;
+window.crRestoring = true;
+saveData();
+window.crRestoring = false;
+renderAll();
+showMessage("Rezervna kopija je učitana.");
+} catch (error) {
+showMessage("Datoteka nije ispravna rezervna kopija.");
+}
+
+event.target.value = "";
+};
+
+reader.readAsText(file);
+}
+
+/* Dodatna zaštita: kontekstni meni nije dozvoljen na pozicijama. */
+document.addEventListener("contextmenu", function(event) {
+if (event.target.closest && event.target.closest(".position")) {
+event.preventDefault();
+}
+});
+
+window.addEventListener("resize", fitAll);
+
+loadData();
+buildDriverChoices();
+buildTables();
+
+/* ===================================================================
+   SISTEM (server): prijava, sinhronizacija, historija, administrator.
+   Sve podatke i ovlaštenja drži zajednička baza (Supabase).
+   Ovaj program samo prikazuje podatke i šalje operacije.
+   =================================================================== */
+(function () {
+'use strict';
+
+const CFGKEY = 'cr_cfg', TOKKEY = 'cr_token', QKEY = 'cr_queue', MEKEY = 'cr_me';
+const get = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
+const put = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+const $ = id => document.getElementById(id);
+const clone = o => JSON.parse(JSON.stringify(o));
+const pad = n => String(n).padStart(2, '0');
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 10) + Math.random().toString(36).slice(2, 6);
+
+/* ---------- vrijeme (njemačko) ---------- */
+const BERLIN = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Berlin', year: 'numeric', month: '2-digit', day: '2-digit',
+  hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+function bp(ts) { const o = {}; BERLIN.formatToParts(new Date(ts)).forEach(p => { o[p.type] = p.value; });
+  return { y: +o.year, mo: +o.month, d: +o.day, h: (+o.hour) % 24, mi: +o.minute, s: +o.second }; }
+function fmtDT(ts) { if (!ts && ts !== 0) return '—'; const p = bp(ts); return pad(p.d) + '.' + pad(p.mo) + '.' + p.y + ' ' + pad(p.h) + ':' + pad(p.mi) + ':' + pad(p.s); }
+function fmtT(ts) { const p = bp(ts); return pad(p.h) + ':' + pad(p.mi); }
+function dayKey(ts) { const p = bp(ts); return p.y + '-' + pad(p.mo) + '-' + pad(p.d); }
+function fmtDay(key) { const a = String(key).split('-'); return a[2] + '.' + a[1] + '.' + a[0]; }
+function berlinToTs(y, mo, d, h, mi) {
+  let t = Date.UTC(y, mo - 1, d, h, mi) - 3 * 3600000;
+  for (let i = 0; i < 400; i++, t += 60000) { const p = bp(t); if (p.y === y && p.mo === mo && p.d === d && p.h === h && p.mi === mi) return t; }
+  return Date.UTC(y, mo - 1, d, h, mi);
+}
+
+/* ---------- mali DOM helper ---------- */
+function h(tag, props) {
+  const e = document.createElement(tag);
+  if (props) for (const k in props) {
+    const v = props[k];
+    if (k === 'class') e.className = v; else if (k === 'style') e.style.cssText = v;
+    else if (k.slice(0, 2) === 'on') e.addEventListener(k.slice(2), v);
+    else if (k === 'value') e.value = v; else if (k === 'checked') e.checked = !!v; else if (k === 'disabled') e.disabled = !!v;
+    else e.setAttribute(k, v);
+  }
+  for (let i = 2; i < arguments.length; i++) [].concat(arguments[i]).forEach(c => {
+    if (c === null || c === undefined || c === false) return;
+    e.appendChild(typeof c === 'object' ? c : document.createTextNode(String(c)));
+  });
+  return e;
+}
+function table(headers, rows) {
+  const t = h('table', { class: 'sys-table' }, h('thead', null, h('tr', null, headers.map(x => h('th', null, x)))));
+  const b = h('tbody'); rows.forEach(r => b.appendChild(h('tr', null, r.map(c => h('td', null, c))))); t.appendChild(b);
+  if (!rows.length) b.appendChild(h('tr', null, h('td', { colspan: headers.length, class: 'sys-empty' }, 'Nema podataka.')));
+  return h('div', { class: 'sys-scroll' }, t);
+}
+const btn = (text, fn, cls) => h('button', { type: 'button', class: 'sys-btn ' + (cls || ''), onclick: fn }, text);
+
+/* ---------- veza sa serverom ---------- */
+const baked = window.CR_CONFIG || {};
+let CFG = { url: baked.url || '', key: baked.key || '' };
+if (!CFG.url || !CFG.key) { const c = get(CFGKEY, {}); CFG = { url: c.url || '', key: c.key || '' }; }
+CFG.url = CFG.url.trim().replace(/\/rest\/v1\/?$/, '').replace(/\/+$/, '');
+
+async function rpc(fn, args) {
+  const headers = { 'Content-Type': 'application/json', apikey: CFG.key };
+  if (/^eyJ/.test(CFG.key)) headers.Authorization = 'Bearer ' + CFG.key;
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 12000);
+  let res;
+  try {
+    res = await fetch(CFG.url.replace(/\/+$/, '') + '/rest/v1/rpc/' + fn, { method: 'POST', headers: headers, body: JSON.stringify(args || {}), signal: ctl.signal });
+  } catch (e) { clearTimeout(to); const err = new Error('Nema veze sa serverom.'); err.net = true; throw err; }
+  clearTimeout(to);
+  let body = null; try { body = await res.json(); } catch (e) {}
+  if (!res.ok) {
+    const err = new Error((body && body.message) || ('Greška servera (' + res.status + ')'));
+    err.status = res.status; if (res.status >= 502 || (res.status === 404 && !(body && body.message))) err.net = true; throw err;
+  }
+  return body;
+}
+const clean = m => String(m || '').replace(/^(AUTH|FORBIDDEN): /, '');
+const isAuth = e => /^AUTH/.test(String(e && e.message || ''));
+
+/* ---------- stanje ---------- */
+let TOKEN = localStorage.getItem(TOKKEY) || '', ME = get(MEKEY, null), queue = get(QKEY, []);
+let online = true, lastOk = 0, snap = null, busy = false, again = false, lastActive = Date.now();
+const saveQ = () => put(QKEY, queue);
+const isAdmin = () => !!(ME && ME.role === 'admin');
+const canGesamt = () => !!(ME && (ME.role === 'admin' || ME.gesamt !== false));
+
+function mapFromServer(list) {
+  const m = {}; list.forEach(c => { m[c.row + '-' + c.pos] = { size: c.size, driver: c.driver, date: c.date, count: c.count, max: c.max }; }); return m;
+}
+function toList(map) {
+  return Object.keys(map).map(k => { const p = k.split('-'), it = map[k]; return { row: p[0], pos: Number(p[1]), size: it.size, driver: it.driver, date: it.date, count: it.count, max: it.max }; });
+}
+function applyLocal(map, o) {
+  const k = o.row + '-' + o.pos;
+  if (o.type === 'new') { if (!map[k]) map[k] = { size: o.size, driver: o.driver, date: o.date, count: 1, max: o.size === 20 ? 6 : 3 }; }
+  else if (o.type === 'inc') { const it = map[k]; if (it && it.count < it.max) it.count++; }
+  else if (o.type === 'delete') { delete map[k]; }
+  else if (o.type === 'import') { Object.keys(map).forEach(x => { delete map[x]; }); (o.data || []).forEach(c => { map[c.row + '-' + c.pos] = { size: c.size, driver: c.driver, date: c.date, count: c.count, max: c.max }; }); }
+}
+
+/* ---------- promjene u programu -> operacije za server ---------- */
+function makeOp(type, extra) { return Object.assign({ id: newId(), type: type, ts: Date.now(), crane: PROGRAM_LABEL }, extra); }
+function diffToOps() {
+  const keys = new Set(Object.keys(snap).concat(Object.keys(data)));
+  keys.forEach(k => {
+    const a = snap[k], b = data[k]; if (JSON.stringify(a) === JSON.stringify(b)) return;
+    const p = k.split('-'), base = { row: p[0], pos: Number(p[1]) };
+    if (!a && b) queue.push(makeOp('new', Object.assign({ size: b.size, driver: b.driver, date: b.date }, base)));
+    else if (a && !b) queue.push(makeOp('delete', base));
+    else if (a.driver === b.driver && a.date === b.date && a.size === b.size && b.count > a.count)
+      queue.push(makeOp('inc', Object.assign({ size: a.size, driver: a.driver, date: a.date }, base)));
+    else { queue.push(makeOp('delete', base)); queue.push(makeOp('new', Object.assign({ size: b.size, driver: b.driver, date: b.date }, base))); }
+  });
+  snap = clone(data); saveQ();
+}
+const origSave = saveData;
+saveData = function () {
+  origSave();
+  if (!ME || !snap) return;
+  if (window.crRestoring) { queue.push(makeOp('import', { data: toList(data) })); snap = clone(data); saveQ(); }
+  else diffToOps();
+  sync();
+};
+
+function conflictMsg(op, r) {
+  const where = 'Pozicija ' + op.pos + ' red ' + op.row;
+  const by = r.by ? ' (' + r.by + ')' : '';
+  const t = { occupied: where + ' je u međuvremenu zauzeta' + by + '. Tvoj unos nije spremljen.',
+    full: where + ' je već potpuno popunjena.', empty: where + ' je u međuvremenu obrisana.',
+    changed: where + ' je u međuvremenu promijenjena' + by + '. Tvoj unos nije spremljen.' };
+  showMessage(t[r.conflict] || (where + ': promjena nije primijenjena.'));
+}
+
+async function flushOnce() {
+  while (queue.length && TOKEN) {
+    const op = queue[0];
+    try {
+      const r = await rpc('api_op', { p_token: TOKEN, p_op: op });
+      queue.shift(); saveQ();
+      if (r && r.ok === false && r.conflict) conflictMsg(op, r);
+    } catch (e) {
+      if (e.net) { online = false; return; }
+      if (isAuth(e)) { authLost(clean(e.message)); return; }
+      queue.shift(); saveQ(); showMessage(clean(e.message));
+    }
+  }
+}
+async function pollOnce() {
+  if (!TOKEN || queue.length) return;
+  try {
+    const r = await rpc('api_state', { p_token: TOKEN, p_active: (Date.now() - lastActive) < 300000 });
+    if (!r.ok) { authLost(clean(r.error)); return; }
+    online = true; lastOk = Date.now(); ME = r.me; put(MEKEY, ME); applyMe();
+    const m = mapFromServer(r.containers); queue.forEach(o => applyLocal(m, o));
+    if (JSON.stringify(m) !== JSON.stringify(data)) { data = m; origSave(); renderAll(); }
+    snap = clone(data);
+  } catch (e) {
+    if (e.net) { online = false; return; }
+    if (isAuth(e)) { authLost(clean(e.message)); return; }
+    showMessage(clean(e.message));
+  }
+}
+async function sync() {
+  if (!ME || !TOKEN) return;
+  if (busy) { again = true; return; }
+  busy = true;
+  try { do { again = false; await flushOnce(); await pollOnce(); } while (again); }
+  finally { busy = false; updateNet(); }
+}
+
+function updateNet() {
+  const stale = !!ME && (!online || !lastOk || (Date.now() - lastOk) > 20000);
+  const b = $('netBanner'); if (!b) return;
+  b.style.display = stale ? 'block' : 'none';
+  b.textContent = (!lastOk && online) ? 'Povezivanje sa serverom…'
+    : 'NEMA VEZE SA SERVEROM – prikazani podaci možda nisu aktuelni.' + (queue.length ? ' Na čekanju: ' + queue.length + ' (šalju se kad se veza vrati).' : '');
+  $('sysNet').className = stale ? 'off' : 'on';
+  $('tables').classList.toggle('stale', stale);
+}
+
+/* ---------- prijava ---------- */
+function authLost(msg) {
+  TOKEN = ''; ME = null; localStorage.removeItem(TOKKEY); localStorage.removeItem(MEKEY); closePanel(); closeDialog();
+  if (msg) showMessage(msg); startup(true);
+}
+async function logout() {
+  try { if (TOKEN && online) await rpc('api_logout', { p_token: TOKEN }); } catch (e) {}
+  TOKEN = ''; ME = null; localStorage.removeItem(TOKKEY); localStorage.removeItem(MEKEY); closePanel(); closeDialog(); startup(true);
+}
+function applyMe() {
+  if (!ME) return;
+  $('sysUser').textContent = ME.name + ' · ' + PROGRAM_LABEL + (ME.role === 'admin' ? ' · Administrator' : '');
+  $('adminBtn').style.display = isAdmin() ? '' : 'none';
+  $('gesamtBtn').style.display = canGesamt() ? '' : 'none';
+  if (gesamt && !canGesamt()) { gesamt = false; buildTables(); }
+}
+function enterApp() {
+  const o = $('loginOverlay'); if (o) o.remove();
+  $('sysBar').style.display = 'flex'; applyMe(); snap = clone(data); updateClock(); updateNet(); sync();
+}
+function updateClock() {
+  const p = fmtDT(Date.now()).split(' ');
+  const c = $('sysClock'); if (c) c.textContent = p[1] + '  ' + p[0];
+  const l = $('loginClock'); if (l) l.textContent = p[1] + '  ' + p[0];
+}
+
+function overlay(card) { const old = $('loginOverlay'); if (old) old.remove(); $('sysBar').style.display = 'none'; $('netBanner').style.display = 'none'; document.body.appendChild(h('div', { id: 'loginOverlay' }, card)); updateClock(); }
+function showConfig() {
+  const url = h('input', { class: 'sys-input', placeholder: 'Project URL (https://xxxx.supabase.co)', value: CFG.url, autocapitalize: 'none' });
+  const key = h('input', { class: 'sys-input', placeholder: 'Ključ (anon / publishable key)', value: CFG.key, autocapitalize: 'none' });
+  const err = h('div', { class: 'login-err' });
+  overlay(h('div', { class: 'login-card' }, h('h2', null, 'POSTAVKA SERVERA'),
+    h('p', null, 'Unesi podatke svog Supabase projekta (jednom na ovom tabletu).'), url, key, err,
+    btn('Spremi i poveži', async () => {
+      CFG = { url: url.value.trim(), key: key.value.trim() };
+      if (!/^https:\/\//.test(CFG.url) || !CFG.key) { err.textContent = 'Unesi ispravan URL i ključ.'; return; }
+      try { await rpc('api_status'); put(CFGKEY, CFG); startup(true); }
+      catch (e) { err.textContent = e.net ? 'Nema veze sa serverom (provjeri URL i internet).' : clean(e.message) + ' – jesi li pokrenuo SQL postavku?'; }
+    }, 'sys-primary')));
+}
+function showLogin(setup, note) {
+  const err = h('div', { class: 'login-err' }, note || '');
+  const card = h('div', { class: 'login-card' }, h('h2', null, 'RASPORED KONTEJNERA – ' + PROGRAM_LABEL), h('div', { class: 'login-clock', id: 'loginClock' }));
+  if (setup) {
+    card.appendChild(h('p', null, 'Prvo pokretanje: napravi administratorski račun.'));
+    const nm = h('input', { class: 'sys-input', placeholder: 'Ime i prezime' }), un = h('input', { class: 'sys-input', placeholder: 'Korisničko ime', autocapitalize: 'none', autocomplete: 'off' });
+    const p1 = h('input', { class: 'sys-input', type: 'password', placeholder: 'Lozinka (najmanje 6 znakova)' }), p2 = h('input', { class: 'sys-input', type: 'password', placeholder: 'Ponovi lozinku' });
+    card.append(nm, un, p1, p2, err, btn('Napravi administratora', async () => {
+      if (p1.value !== p2.value) { err.textContent = 'Lozinke se ne podudaraju.'; return; }
+      try { await rpc('api_setup_admin', { p_name: nm.value, p_username: un.value, p_password: p1.value }); await doLogin(un.value, p1.value, err); }
+      catch (e) { err.textContent = clean(e.message); }
+    }, 'sys-primary'));
+  } else {
+    const un = h('input', { class: 'sys-input', placeholder: 'Korisničko ime', autocapitalize: 'none', autocomplete: 'off' });
+    const pw = h('input', { class: 'sys-input', type: 'password', placeholder: 'Lozinka' });
+    const go = () => doLogin(un.value, pw.value, err, pw);
+    pw.addEventListener('keydown', ev => { if (ev.key === 'Enter') go(); });
+    card.append(un, pw, err, btn('Prijava', go, 'sys-primary'));
+  }
+  card.appendChild(btn('Postavke servera', showConfig, 'sys-link'));
+  overlay(card);
+}
+async function doLogin(u, p, err, pw) {
+  try {
+    const r = await rpc('api_login', { p_username: u, p_password: p, p_crane: PROGRAM_LABEL });
+    if (!r.ok) { err.textContent = r.error; if (pw) pw.value = ''; return; }
+    TOKEN = r.token; ME = r.user; localStorage.setItem(TOKKEY, TOKEN); put(MEKEY, ME); lastOk = 0; enterApp();
+  } catch (e) { err.textContent = e.net ? 'Nema veze sa serverom. Prijava nije moguća.' : clean(e.message); }
+}
+async function startup(fresh) {
+  if (!CFG.url || !CFG.key) { showConfig(); return; }
+  if (TOKEN && !fresh) {
+    try {
+      const r = await rpc('api_state', { p_token: TOKEN, p_active: true });
+      if (r.ok) { ME = r.me; put(MEKEY, ME); online = true; lastOk = Date.now(); enterApp(); return; }
+    } catch (e) {
+      if (e.net && ME) { online = false; enterApp(); return; }
+    }
+    TOKEN = ''; ME = null; localStorage.removeItem(TOKKEY); localStorage.removeItem(MEKEY);
+  }
+  try { const st = await rpc('api_status'); showLogin(!!st.setup_needed); }
+  catch (e) { showLogin(false, e.net ? 'Nema veze sa serverom.' : clean(e.message)); }
+}
+
+/* ---------- paneli ---------- */
+function closePanel() { const p = $('sysPanel'); if (p) p.remove(); }
+function openPanel(title, build) {
+  closePanel(); const body = h('div', { class: 'sys-body' });
+  document.body.appendChild(h('div', { id: 'sysPanel' }, h('div', { class: 'sys-head' }, h('strong', null, title), btn('Zatvori', closePanel, 'sys-close')), body));
+  build(body); return body;
+}
+async function act(fn, args, okMsg) {
+  try { const r = await rpc(fn, Object.assign({ p_token: TOKEN }, args || {})); if (okMsg) showMessage(okMsg); return r || {}; }
+  catch (e) {
+    if (e.net) showMessage('Nema veze sa serverom.'); else if (isAuth(e)) authLost(clean(e.message)); else showMessage(clean(e.message));
+    return null;
+  }
+}
+
+/* ---------- historija ---------- */
+const FIELDS = { user: 'Radnik', crane: 'Kran', pos: 'Pozicija', ts: 'Vrijeme', type: 'Vrsta radnje', prev: 'Prethodno stanje', next: 'Novo stanje' };
+function effLog(hist, corr) {
+  const by = {}; corr.forEach(c => { (by[c.targetId] = by[c.targetId] || []).push(c); });
+  return hist.map(e => { const cs = by[e.id]; if (!cs) return e; const o = Object.assign({}, e, { corrected: true });
+    cs.slice().sort((a, b) => a.id - b.id).forEach(c => { o[c.field] = c.field === 'ts' ? Date.parse(c.newValue) : c.newValue; }); return o; });
+}
+const posText = e => (e.pos !== null && e.pos !== undefined && e.pos !== '') ? (e.pos + (e.row ? ' ' + e.row : '')) : '—';
+function historyRows(hist, corr, filter) {
+  const rows = effLog(hist, corr).map(e => ({ ts: e.ts, e: e, cells: [fmtDT(e.ts) + (e.corrected ? ' ✎' : ''), e.user, e.crane, posText(e), e.type, e.prev || '', e.next || ''] }));
+  corr.forEach(c => rows.push({ ts: c.ts, cells: [fmtDT(c.ts), c.admin, '', '', 'KOREKCIJA', FIELDS[c.field] + ': ' + (c.field === 'ts' ? fmtDT(Date.parse(c.oldValue)) : c.oldValue),
+    (c.field === 'ts' ? fmtDT(Date.parse(c.newValue)) : c.newValue) + ' (razlog: ' + c.reason + ')'] }));
+  rows.sort((a, b) => b.ts - a.ts);
+  const f = (filter || '').toLowerCase().trim();
+  return rows.filter(r => !f || r.cells.join(' ').toLowerCase().indexOf(f) >= 0);
+}
+async function loadHistory(limit) {
+  const r = await act('api_history', { p_limit: limit || 500 }); return r ? { hist: r.history || [], corr: r.corrections || [] } : null;
+}
+async function renderHistory(host, onPick) {
+  host.appendChild(h('div', { class: 'sys-note' }, 'Učitavam…'));
+  const d = await loadHistory(isAdmin() ? 5000 : 500); host.innerHTML = ''; if (!d) { host.appendChild(h('div', { class: 'sys-note' }, 'Historija nije dostupna (nema veze).')); return; }
+  const holder = h('div'), inp = h('input', { class: 'sys-input', placeholder: 'Pretraga (radnik, pozicija, radnja, datum…)' });
+  function draw() {
+    holder.innerHTML = ''; const rows = historyRows(d.hist, d.corr, inp.value).slice(0, 500);
+    const heads = ['Vrijeme', 'Radnik', 'Kran', 'Poz.', 'Radnja', 'Prije', 'Poslije']; if (onPick) heads.push('');
+    holder.appendChild(table(heads, rows.map(r => r.cells.concat(onPick ? [r.e ? btn('Ispravi', () => onPick(r.e)) : ''] : []))));
+    holder.appendChild(h('div', { class: 'sys-note' }, 'Prikazano najviše 500 zapisa (najnoviji prvo). ✎ = ispravljeno korekcijom administratora.'));
+  }
+  inp.addEventListener('input', draw); host.append(inp, holder); draw();
+}
+function openHistory() { openPanel('HISTORIJA', body => { body.appendChild(h('div', { class: 'sys-note' }, 'Pregled je samo za čitanje.')); const host = h('div'); body.appendChild(host); renderHistory(host); }); }
+
+/* ---------- ADMINISTRATOR ---------- */
+function openAdmin() {
+  if (!isAdmin()) { showMessage('Nemaš ovlaštenje.'); return; }
+  const TABS = [['Korisnici', tabUsers], ['Podaci za prijavu', tabLogins], ['Aktivni radnici', tabActive], ['Historija', tabHist],
+    ['Dnevni izvještaji', tabReports], ['Statistika', tabStats], ['Pregled skladišta', tabWare], ['Korekcije', tabCorr],
+    ['Sigurnosne kopije', tabBackup], ['Podešavanja', tabSettings]];
+  openPanel('ADMINISTRATOR', root => {
+    const bar = h('div', { class: 'sys-tabs' }), body = h('div'); root.append(bar, body);
+    const btns = TABS.map((t, i) => btn(t[0], () => show(i), 'sys-tab')); btns.forEach(b => bar.appendChild(b));
+    async function show(i) {
+      btns.forEach((b, j) => b.classList.toggle('on', i === j)); body.innerHTML = ''; body.appendChild(h('div', { class: 'sys-note' }, 'Učitavam…'));
+      const holder = h('div'); try { await TABS[i][1](holder, () => show(i)); } catch (e) { holder.appendChild(h('div', { class: 'sys-note' }, 'Greška: ' + e.message)); }
+      body.innerHTML = ''; body.appendChild(holder);
+    }
+    show(0);
+  });
+}
+async function getUsers() { const r = await act('api_admin_users'); return r ? r.users : []; }
+async function getSessions() { const r = await act('api_admin_sessions'); return r ? r : { sessions: [], now: Date.now() }; }
+
+async function tabUsers(body, refresh) {
+  const users = await getUsers();
+  const nm = h('input', { class: 'sys-input', placeholder: 'Ime i prezime' }), un = h('input', { class: 'sys-input', placeholder: 'Korisničko ime', autocapitalize: 'none' });
+  const pw = h('input', { class: 'sys-input', placeholder: 'Početna lozinka (najmanje 6 znakova)' });
+  const cr = h('select', { class: 'sys-input' }, h('option', { value: '' }, 'Kran: —'), h('option', { value: 'NORD' }, 'Kran: NORD'), h('option', { value: 'SÜD' }, 'Kran: SÜD'));
+  const ad = h('input', { type: 'checkbox' }), ge = h('input', { type: 'checkbox', checked: true });
+  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Novi radnik'), nm, un, pw, cr,
+    h('label', { class: 'sys-check' }, ge, ' GESAMT dozvoljen'), h('label', { class: 'sys-check' }, ad, ' Administrator'),
+    btn('Dodaj radnika', async () => {
+      const r = await act('api_admin_user_create', { p_name: nm.value, p_username: un.value, p_password: pw.value, p_role: ad.checked ? 'admin' : 'worker', p_crane: cr.value, p_gesamt: ge.checked }, 'Radnik je dodan.');
+      if (r) refresh();
+    }, 'sys-primary')));
+  const upd = async (u, patch, msg) => { const r = await act('api_admin_user_update', { p_id: u.id, p_patch: patch }, msg); if (r) refresh(); };
+  body.appendChild(table(['Ime', 'Korisničko ime', 'Uloga', 'Kran', 'GESAMT', 'Status', 'Radnje'], users.map(u => [
+    u.name, u.username, u.role === 'admin' ? 'Administrator' : 'Radnik',
+    (function () { const s = h('select', { class: 'sys-input sys-mini', onchange: () => upd(u, { crane: s.value }) }, ['', 'NORD', 'SÜD'].map(v => h('option', { value: v }, v || '—'))); s.value = u.crane || ''; return s; })(),
+    h('input', { type: 'checkbox', checked: u.gesamt !== false, onchange: ev => upd(u, { gesamt: ev.target.checked }) }),
+    u.active ? 'Aktivan' : 'Deaktiviran',
+    h('div', { class: 'sys-actions' },
+      btn('Korisničko ime', () => { const v = prompt('Novo korisničko ime za ' + u.name + ':', u.username); if (v !== null) upd(u, { username: v }, 'Korisničko ime je promijenjeno.'); }),
+      btn('Resetuj lozinku', async () => { const v = prompt('Nova lozinka za ' + u.name + ' (najmanje 6 znakova):'); if (v === null) return; await act('api_admin_user_password', { p_id: u.id, p_password: v }, 'Lozinka je promijenjena.'); }),
+      btn(u.active ? 'Deaktiviraj' : 'Aktiviraj', () => upd(u, { active: !u.active })),
+      btn(u.role === 'admin' ? 'Ukloni admina' : 'Postavi admina', () => upd(u, { role: u.role === 'admin' ? 'worker' : 'admin' })))])));
+}
+async function tabLogins(body) {
+  const users = await getUsers();
+  body.appendChild(h('div', { class: 'sys-note' }, 'Lozinke se čuvaju samo kao hash i ne mogu se pročitati. Administrator ih može samo resetovati.'));
+  body.appendChild(table(['Ime i prezime', 'Korisničko ime', 'Kran', 'Status', 'Račun kreiran', 'Posljednja prijava', 'Zadnja promjena lozinke'],
+    users.map(u => [u.name, u.username, u.crane || '—', u.active ? 'Aktivan' : 'Deaktiviran', fmtDT(u.created), u.lastLogin ? fmtDT(u.lastLogin) : '—', u.pwChanged ? fmtDT(u.pwChanged) : '—'])));
+}
+async function tabActive(body) {
+  const d = await getSessions();
+  body.appendChild(table(['Radnik', 'Program', 'Kran', 'Prijavljen od', 'Aktivnost', 'Veza sa serverom'],
+    d.sessions.filter(s => !s.logoutAt).map(s => { const idle = Math.round((d.now - (s.lastActive || s.loginAt)) / 60000), seen = s.seen ? (d.now - s.seen) / 1000 : 99999;
+      return [s.name, 'LAGER ' + s.crane, s.crane, fmtDT(s.loginAt), idle < 10 ? 'Aktivan' : 'Mirovanje ' + idle + ' min', seen < 20 ? 'Povezan' : 'Bez veze (zadnji signal ' + (s.seen ? fmtT(s.seen) : '—') + ')']; })));
+}
+async function tabHist(body) { await renderHistory(body); }
+
+function sessionStats(s, es) {
+  const mine = es.filter(e => e.sessionId === s.id), g = { unos: 0, brisanje: 0, ostalo: 0 }, pos = {};
+  mine.forEach(e => { if (e.type === 'Unos kontejnera') g.unos++; else if (e.type === 'Brisanje kontejnera') g.brisanje++; else g.ostalo++; if (e.pos) pos[e.pos + (e.row || '')] = 1; });
+  g.positions = Object.keys(pos).join(', ') || '—'; g.entries = mine; return g;
+}
+async function tabReports(body) {
+  const [sd, hd, users] = await Promise.all([getSessions(), loadHistory(20000), getUsers()]);
+  const es = hd ? effLog(hd.hist, hd.corr) : [], shifts = Array.from(new Set(sd.sessions.map(s => s.shiftName)));
+  const f = { user: '', crane: '', from: '', to: '', shift: '', q: '' }, list = h('div');
+  const sel = (opts, key) => { const s = h('select', { class: 'sys-input', onchange: () => { f[key] = s.value; draw(); } }, opts.map(o => h('option', { value: o[0] }, o[1]))); return s; };
+  const dFrom = h('input', { class: 'sys-input', type: 'date', onchange: () => { f.from = dFrom.value; draw(); } }), dTo = h('input', { class: 'sys-input', type: 'date', onchange: () => { f.to = dTo.value; draw(); } });
+  const q = h('input', { class: 'sys-input', placeholder: 'Pretraga po imenu', oninput: () => { f.q = q.value; draw(); } });
+  body.appendChild(h('div', { class: 'sys-filters' }, sel([['', 'Svi radnici']].concat(users.map(u => [u.id, u.name])), 'user'), sel([['', 'Oba krana'], ['NORD', 'NORD'], ['SÜD', 'SÜD']], 'crane'),
+    sel([['', 'Sve smjene']].concat(shifts.map(s => [s, s])), 'shift'), h('label', null, 'Od ', dFrom), h('label', null, 'Do ', dTo), q));
+  body.appendChild(list);
+  function draw() {
+    list.innerHTML = '';
+    const rows = sd.sessions.filter(s => (!f.user || s.userId === f.user) && (!f.crane || s.crane === f.crane) && (!f.shift || s.shiftName === f.shift) &&
+      (!f.from || s.shiftDay >= f.from) && (!f.to || s.shiftDay <= f.to) && (!f.q || s.name.toLowerCase().indexOf(f.q.toLowerCase()) >= 0));
+    list.appendChild(table(['Radnik', 'Datum smjene', 'Smjena', 'Kran', 'Početak', 'Kraj', 'Unosa', 'Brisanja', 'Ostalo', ''], rows.map(s => { const g = sessionStats(s, es);
+      return [s.name, fmtDay(s.shiftDay), s.shiftName, s.crane, fmtT(s.loginAt), s.logoutAt ? fmtT(s.logoutAt) + (s.auto ? ' (auto)' : '') : 'u toku', g.unos, g.brisanje, g.ostalo, btn('Detalji', () => detail(s))]; })));
+    list.appendChild(h('div', { class: 'sys-note' }, 'Izvještaj se automatski pravi za svaku smjenu i ostaje sačuvan na serveru. Zaboravljena odjava se zatvara na kraju smjene (oznaka „auto“).'));
+  }
+  function detail(s) {
+    body.innerHTML = ''; const g = sessionStats(s, es);
+    body.appendChild(btn('‹ Nazad na izvještaje', () => { body.innerHTML = ''; tabReports(body); }));
+    body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Izvještaj smjene: ' + s.shiftName + ' – ' + fmtDay(s.shiftDay)), h('div', null, 'Radnik: ' + s.name), h('div', null, 'Kran: ' + s.crane),
+      h('div', null, 'Rad od ' + fmtDT(s.loginAt) + ' do ' + (s.logoutAt ? fmtDT(s.logoutAt) : 'u toku')),
+      h('div', null, 'Uneseno: ' + g.unos + ' · Obrisano: ' + g.brisanje + ' · Ostale izmjene: ' + g.ostalo), h('div', null, 'Pozicije: ' + g.positions)));
+    body.appendChild(table(['Vrijeme', 'Poz.', 'Radnja', 'Prije', 'Poslije'], g.entries.map(e => [fmtDT(e.ts) + (e.corrected ? ' ✎' : ''), posText(e), e.type, e.prev || '', e.next || ''])));
+  }
+  draw();
+}
+async function tabStats(body) {
+  const hd = await loadHistory(20000), es = hd ? effLog(hd.hist, hd.corr) : [];
+  const sd = await getSessions(), shiftOf = {}; sd.sessions.forEach(s => { shiftOf[s.id] = s.shiftName; });
+  const group = fn => { const m = {}; es.forEach(e => { const k = fn(e); m[k] = m[k] || { u: 0, b: 0, o: 0 }; if (e.type === 'Unos kontejnera') m[k].u++; else if (e.type === 'Brisanje kontejnera') m[k].b++; else m[k].o++; }); return m; };
+  const block = (title, m) => { body.appendChild(h('h3', { class: 'sys-h3' }, title)); body.appendChild(table(['', 'Uneseno', 'Obrisano', 'Ostale izmjene'], Object.keys(m).sort().map(k => [k, m[k].u, m[k].b, m[k].o]))); };
+  block('Ukupno', group(() => 'UKUPNO')); block('Po radnicima', group(e => e.user)); block('Po kranovima', group(e => e.crane));
+  block('Po danima', group(e => fmtDay(dayKey(e.ts)))); block('Po smjenama', group(e => shiftOf[e.sessionId] || 'nepoznato'));
+  body.appendChild(h('div', { class: 'sys-note' }, 'Statistika se računa iz evidentiranih događaja (u skladu s dnevnim čišćenjem, ako je uključeno). Premještanje kao posebna radnja u programu ne postoji.'));
+}
+async function tabWare(body) {
+  const rows = []; Object.keys(data).forEach(k => { const it = data[k], p = k.split('-'); rows.push([Number(p[1]), p[0], it]); });
+  rows.sort((a, b) => a[0] - b[0] || a[1].localeCompare(b[1]));
+  ALL_RANGES.forEach(r => { const mine = rows.filter(x => x[0] >= r[1] && x[0] <= r[2]); let c = 0; mine.forEach(x => { c += x[2].count; });
+    body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, r[0] + ' (' + r[1] + '–' + r[2] + ')'), h('div', null, 'Zauzetih polja: ' + mine.length + ' od ' + (r[2] - r[1] + 1) * 2 + ' · Kontejnera: ' + c))); });
+  body.appendChild(table(['Poz.', 'Red', 'Voz', 'Datum', 'Veličina', 'Broj'], rows.map(x => [x[0], x[1], x[2].driver, formatDate(x[2].date), x[2].size + ' stopa', x[2].count + '/' + x[2].max])));
+}
+async function tabCorr(body) {
+  body.appendChild(h('div', { class: 'sys-note' }, 'Original ostaje sačuvan. Svaka korekcija pravi novi zapis (ko, kada, staro, novo, razlog).'));
+  const host = h('div'); body.appendChild(host);
+  await renderHistory(host, e => {
+    body.innerHTML = ''; body.appendChild(btn('‹ Nazad', () => { body.innerHTML = ''; tabCorr(body); }));
+    const fld = h('select', { class: 'sys-input' }, Object.keys(FIELDS).map(k => h('option', { value: k }, FIELDS[k])));
+    const val = h('input', { class: 'sys-input' }), reason = h('textarea', { class: 'sys-input', placeholder: 'Razlog korekcije (obavezno)', rows: 3 }), err = h('div', { class: 'login-err' });
+    const cur = () => { const k = fld.value; if (k === 'ts') { const p = bp(e.ts); val.type = 'datetime-local'; val.value = p.y + '-' + pad(p.mo) + '-' + pad(p.d) + 'T' + pad(p.h) + ':' + pad(p.mi); } else { val.type = 'text'; val.value = (e[k] === undefined || e[k] === null) ? '' : e[k]; } };
+    fld.addEventListener('change', cur); cur();
+    body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Korekcija: ' + fmtDT(e.ts) + ' · ' + e.user + ' · ' + e.type + ' · ' + posText(e)), fld, val, reason, err,
+      btn('Sačuvaj korekciju', async () => {
+        if (!reason.value.trim()) { err.textContent = 'Razlog je obavezan.'; return; }
+        let nv = val.value;
+        if (fld.value === 'ts') { const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(nv); if (!m) { err.textContent = 'Neispravan datum.'; return; } nv = new Date(berlinToTs(+m[1], +m[2], +m[3], +m[4], +m[5])).toISOString(); }
+        const r = await act('api_admin_correct', { p_history_id: e.id, p_field: fld.value, p_new: nv, p_reason: reason.value }, 'Korekcija je sačuvana.');
+        if (r) { body.innerHTML = ''; tabCorr(body); }
+      }, 'sys-primary')));
+  });
+}
+function download(name, obj) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' }));
+  const a = h('a', { href: url, download: name }); document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+async function tabBackup(body, refresh) {
+  const r = await act('api_admin_backups'), list = r ? r.backups : [];
+  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Kopije na serveru'),
+    h('div', { class: 'sys-note' }, 'Server sam pravi kopiju jednom dnevno (čuva se zadnjih 30) i prije svakog učitavanja ili vraćanja kopije.'),
+    btn('Spremi kopiju sada', async () => { if (await act('api_admin_backup_now', {}, 'Kopija je spremljena.')) refresh(); }, 'sys-primary')));
+  body.appendChild(table(['Datum', 'Vrsta', 'Opis', 'Zauzetih polja', ''], list.map(b => [fmtDT(b.createdAt), b.kind, b.note || '', b.containers,
+    h('div', { class: 'sys-actions' },
+      btn('Preuzmi', async () => { const g = await act('api_admin_backup_get', { p_id: b.id }); if (g) download('kopija-server-' + b.id + '.json', g.backup); }),
+      btn('Vrati kontejnere', async () => { if (!confirm('Vratiti stanje kontejnera iz ove kopije? Trenutno stanje se prije toga automatski sprema.')) return; if (await act('api_admin_restore', { p_id: b.id }, 'Kontejneri su vraćeni.')) { refresh(); sync(); } }))])));
+}
+async function tabSettings(body) {
+  const r = await act('api_admin_settings', {}); if (!r) return;
+  const rows = r.shifts.map(s => ({ n: h('input', { class: 'sys-input', value: s.name }), t: h('input', { class: 'sys-input', type: 'time', value: s.start }) }));
+  const dc = h('input', { type: 'checkbox', checked: r.dailyClear });
+  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Smjene (njemačko vrijeme)'), rows.map(x => h('div', { class: 'sys-row' }, x.n, x.t)),
+    h('label', { class: 'sys-check' }, dc, ' Svaki dan obriši historiju i izvještaje prethodnih dana (kontejneri ostaju; kopija se prije toga automatski sprema)'),
+    h('div', { class: 'sys-note' }, 'Zadnje dnevno čišćenje: ' + (r.lastClear ? fmtDay(r.lastClear) : '—')),
+    btn('Sačuvaj podešavanja', () => act('api_admin_settings', { p_shifts: rows.map(x => ({ name: x.n.value.trim(), start: x.t.value })), p_daily_clear: dc.checked }, 'Podešavanja su sačuvana.'), 'sys-primary')));
+  const p1 = h('input', { class: 'sys-input', type: 'password', placeholder: 'Nova lozinka (najmanje 6 znakova)' });
+  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Moja lozinka'), p1,
+    btn('Promijeni lozinku', async () => { if (await act('api_admin_user_password', { p_id: ME.id, p_password: p1.value }, 'Lozinka je promijenjena.')) p1.value = ''; })));
+}
+
+/* ---------- pokretanje ---------- */
+$('sysLogout').addEventListener('click', logout);
+$('histBtn').addEventListener('click', openHistory);
+$('adminBtn').addEventListener('click', openAdmin);
+['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { lastActive = Date.now(); }, true));
+setInterval(() => { updateClock(); updateNet(); }, 1000);
+setInterval(() => { if (ME) sync(); }, 3000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && ME) sync(); });
+window.addEventListener('online', () => { if (ME) sync(); });
+$('adminBtn').style.display = 'none';
+startup(false);
+})();
+
+</script>
+
+
+<script>
+if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) {
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+ "id": "./nord.html",
+ "name": "Raspored kontejnera – NORD",
+ "short_name": "Lager NORD",
+ "start_url": "./nord.html",
+ "scope": "./",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#172d40",
+ "theme_color": "#172d40",
+ "lang": "hr",
+ "icons": [
+  {
+   "src": "icon-nord-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-nord-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-nord-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "maskable"
+  },
+  {
+   "src": "icon-nord-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ]
+}
