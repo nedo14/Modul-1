@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="hr">
+<html lang="de">
 <head>
 <script>window.CR_CONFIG = { url: "https://oaquvarnbytnrmdsyrwo.supabase.co", key: "sb_publishable_S6zpQtrEJWY0c92KMQUDBQ_p5NkfYOc" };</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#172d40">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light">
 <link rel="manifest" href="manifest-nord.webmanifest">
 <link rel="icon" type="image/png" href="icon-nord-192.png">
 <link rel="apple-touch-icon" href="icon-nord-192.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>Raspored kontejnera – NORD</title>
+<title>Containerplan – NORD</title>
 <style>
 * { box-sizing: border-box; }
 
@@ -18,9 +19,10 @@ body {
 margin: 0;
 padding: 8px;
 font-family: Arial, sans-serif;
-background: #e8eef2;
+background: #ffffff;
 color: #172d40;
 }
+html { background: #ffffff; color-scheme: light; }
 
 header { text-align: center; padding: 10px 4px; }
 h1 { margin: 0 0 10px; font-size: 23px; }
@@ -456,29 +458,34 @@ text-align: center; padding: 7px 8px; border-radius: 7px; margin-bottom: 6px;
 #sysNet.off { color: #ff6b5e; }
 .tables.stale { opacity: 0.55; }
 .sys-link { background: transparent; color: #244c68; text-decoration: underline; padding: 4px; font-size: 12px; }
+
+/* bijela pozadina i svijetli prikaz */
+html, body { background: #ffffff !important; color-scheme: light; }
+#loginOverlay { background: #ffffff !important; }
+.login-card { border: 1px solid #bac7d0; box-shadow: 0 2px 14px rgba(0,0,0,0.12); }
 </style>
 </head>
 
 <body>
 
-<div id="sysBar"><span id="sysNet" class="off">●</span><span id="sysUser"></span><span id="sysClock"></span><button type="button" id="sysLogout">Odjava</button></div>
+<div id="sysBar"><span id="sysNet" class="off">●</span><span id="sysUser"></span><span id="sysClock"></span><button type="button" id="sysLogout">Abmelden</button></div>
 <div id="netBanner"></div>
 
 <header>
-<h1>RASPORED KONTEJNERA</h1>
+<h1>CONTAINERPLAN</h1>
 
 <div class="stats">
-<div class="stat"><strong id="totalPositions">60</strong><span>Broj pozicija</span></div>
-<div class="stat"><strong id="occupiedPositions">0</strong><span>Zauzeto</span></div>
-<div class="stat"><strong id="freePositions">60</strong><span>Slobodno</span></div>
-<div class="stat"><strong id="totalContainers">0</strong><span>Kontejnera</span></div>
+<div class="stat"><strong id="totalPositions">60</strong><span>Positionen</span></div>
+<div class="stat"><strong id="occupiedPositions">0</strong><span>Belegt</span></div>
+<div class="stat"><strong id="freePositions">60</strong><span>Frei</span></div>
+<div class="stat"><strong id="totalContainers">0</strong><span>Container</span></div>
 </div>
 
 <div class="actions">
-<button onclick="exportBackup()">Sačuvaj kopiju</button>
-<button onclick="document.getElementById('backupFile').click()">Učitaj kopiju</button>
+<button onclick="exportBackup()">Kopie speichern</button>
+<button onclick="document.getElementById('backupFile').click()">Kopie laden</button>
 <button id="gesamtBtn" onclick="toggleGesamt()">GESAMT</button>
-<button id="histBtn" type="button">Historija</button>
+<button id="histBtn" type="button">Historie</button>
 <button id="adminBtn" type="button" style="display:none">ADMINISTRATOR</button>
 <input id="backupFile" type="file" accept=".json,application/json"
 style="display:none" onchange="importBackup(event)">
@@ -488,21 +495,21 @@ style="display:none" onchange="importBackup(event)">
 <div id="tables" class="tables"></div>
 
 <div class="hint">
-Dodir na prazno polje = novi unos. Dodir na zauzeto = dodaj kontejner.
-Drži polje 2 sekunde za brisanje.
+Tippen auf ein freies Feld = neue Eingabe. Tippen auf ein belegtes Feld = Container hinzufügen.
+Feld 2 Sekunden gedrückt halten = löschen.
 </div>
 
-<div class="summary-title">BROJ KONTEJNERA PO VOZU</div>
+<div class="summary-title">CONTAINER PRO ZUG</div>
 
 <div class="summary-wrap">
 <table class="summary-table">
 <thead>
-<tr><th>Voz</th><th>Vrijeme</th><th>Broj kontejnera</th></tr>
+<tr><th>Zug</th><th>Zeit</th><th>Anzahl Container</th></tr>
 </thead>
 <tbody id="driverSummary"></tbody>
 <tfoot>
 <tr class="total-row">
-<td colspan="2">UKUPNO</td>
+<td colspan="2">SUMME</td>
 <td class="number" id="driverGrandTotal">0</td>
 </tr>
 </tfoot>
@@ -510,23 +517,23 @@ Drži polje 2 sekunde za brisanje.
 </div>
 
 <dialog id="entryDialog">
-<h2 id="dialogTitle">Nova pozicija</h2>
+<h2 id="dialogTitle">Neue Position</h2>
 
 <div class="dialog-section" id="sizeSection">
-<p>Izaberi veličinu kontejnera:</p>
+<p>Containergröße wählen:</p>
 <div class="choice-grid" id="sizeChoices">
-<button type="button" onclick="chooseSize(20)">20 stopa</button>
-<button type="button" onclick="chooseSize(40)">40 stopa</button>
+<button type="button" onclick="chooseSize(20)">20 Fuß</button>
+<button type="button" onclick="chooseSize(40)">40 Fuß</button>
 </div>
 </div>
 
 <div class="dialog-section" id="driverSection" style="display:none">
-<p>Izaberi vozača:</p>
+<p>Zug wählen:</p>
 <div class="driver-choice-grid" id="driverChoiceGrid"></div>
 </div>
 
 <div class="dialog-section" id="dateSection" style="display:none">
-<p>Izaberi datum:</p>
+<p>Datum wählen:</p>
 <div class="calendar">
 <div class="calendar-header">
 <button type="button" onclick="changeMonth(-1)">‹</button>
@@ -534,12 +541,12 @@ Drži polje 2 sekunde za brisanje.
 <button type="button" onclick="changeMonth(1)">›</button>
 </div>
 <div class="calendar-grid" id="calendarGrid"></div>
-<div class="calendar-note">Dodirni datum i kontejner će se odmah memorisati.</div>
+<div class="calendar-note">Datum antippen – der Container wird sofort gespeichert.</div>
 </div>
 </div>
 
 <div class="dialog-buttons">
-<button class="cancel" type="button" onclick="closeDialog()">Odustani</button>
+<button class="cancel" type="button" onclick="closeDialog()">Abbrechen</button>
 </div>
 </dialog>
 
@@ -580,11 +587,11 @@ const driverTimes = {
 };
 
 const monthNames = [
-"Januar", "Februar", "Mart", "April", "Maj", "Juni",
-"Juli", "August", "Septembar", "Oktobar", "Novembar", "Decembar"
+"Januar", "Februar", "März", "April", "Mai", "Juni",
+"Juli", "August", "September", "Oktober", "November", "Dezember"
 ];
 
-const weekdays = ["Pon", "Uto", "Sri", "Čet", "Pet", "Sub", "Ned"];
+const weekdays = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
 let data = {};
 let gesamt = false;
@@ -640,7 +647,7 @@ if (clean) data = clean;
 }
 } catch (error) {
 data = {};
-showMessage("Nije moguće učitati sačuvane podatke.");
+showMessage("Gespeicherte Daten konnten nicht geladen werden.");
 }
 }
 
@@ -649,7 +656,7 @@ try {
 localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 updateStats();
 } catch (error) {
-showMessage("Greška pri čuvanju podataka.");
+showMessage("Fehler beim Speichern der Daten.");
 }
 }
 
@@ -725,7 +732,7 @@ col.appendChild(wrap);
 host.appendChild(col);
 });
 
-document.getElementById("gesamtBtn").textContent = gesamt ? ("Nazad na " + PROGRAM_LABEL) : "GESAMT";
+document.getElementById("gesamtBtn").textContent = gesamt ? ("Zurück zu " + PROGRAM_LABEL) : "GESAMT";
 renderAll();
 }
 
@@ -763,7 +770,7 @@ delete data[box.dataset.key];
 saveData();
 renderPosition(box.dataset.key);
 
-showMessage("Pozicija je obrisana.");
+showMessage("Position wurde gelöscht.");
 }, 2000);
 }
 });
@@ -807,7 +814,7 @@ return;
 }
 
 if (item.count >= item.max) {
-showMessage("Ova pozicija je potpuno popunjena.");
+showMessage("Diese Position ist voll belegt.");
 return;
 }
 
@@ -827,7 +834,7 @@ selectedSize = null;
 selectedDriver = null;
 
 document.getElementById("dialogTitle").textContent =
-"SP " + sp + " — red " + row;
+"SP " + sp + " — Reihe " + row;
 
 document.getElementById("sizeSection").style.display = "block";
 document.getElementById("driverSection").style.display = "none";
@@ -837,12 +844,12 @@ const sizeChoices = document.getElementById("sizeChoices");
 
 if (row === "B") {
 sizeChoices.innerHTML =
-'<button type="button" class="chosen" onclick="chooseSize(40)">40 stopa</button>';
+'<button type="button" class="chosen" onclick="chooseSize(40)">40 Fuß</button>';
 chooseSize(40);
 } else {
 sizeChoices.innerHTML =
-'<button type="button" onclick="chooseSize(20)">20 stopa</button>' +
-'<button type="button" onclick="chooseSize(40)">40 stopa</button>';
+'<button type="button" onclick="chooseSize(20)">20 Fuß</button>' +
+'<button type="button" onclick="chooseSize(40)">40 Fuß</button>';
 }
 
 document.getElementById("entryDialog").showModal();
@@ -988,7 +995,7 @@ max: max
 saveData();
 renderPosition(selectedPosition.key);
 closeDialog();
-showMessage("Kontejner je automatski memorisan.");
+showMessage("Container wurde automatisch gespeichert.");
 }
 
 function closeDialog() {
@@ -1172,7 +1179,7 @@ link.click();
 link.remove();
 URL.revokeObjectURL(url);
 
-showMessage("Rezervna kopija je pripremljena.");
+showMessage("Sicherungskopie wurde erstellt.");
 }
 
 function importBackup(event) {
@@ -1195,9 +1202,9 @@ window.crRestoring = true;
 saveData();
 window.crRestoring = false;
 renderAll();
-showMessage("Rezervna kopija je učitana.");
+showMessage("Sicherungskopie wurde geladen.");
 } catch (error) {
-showMessage("Datoteka nije ispravna rezervna kopija.");
+showMessage("Die Datei ist keine gültige Sicherungskopie.");
 }
 
 event.target.value = "";
@@ -1269,7 +1276,7 @@ function h(tag, props) {
 function table(headers, rows) {
   const t = h('table', { class: 'sys-table' }, h('thead', null, h('tr', null, headers.map(x => h('th', null, x)))));
   const b = h('tbody'); rows.forEach(r => b.appendChild(h('tr', null, r.map(c => h('td', null, c))))); t.appendChild(b);
-  if (!rows.length) b.appendChild(h('tr', null, h('td', { colspan: headers.length, class: 'sys-empty' }, 'Nema podataka.')));
+  if (!rows.length) b.appendChild(h('tr', null, h('td', { colspan: headers.length, class: 'sys-empty' }, 'Keine Daten.')));
   return h('div', { class: 'sys-scroll' }, t);
 }
 const btn = (text, fn, cls) => h('button', { type: 'button', class: 'sys-btn ' + (cls || ''), onclick: fn }, text);
@@ -1287,16 +1294,49 @@ async function rpc(fn, args) {
   let res;
   try {
     res = await fetch(CFG.url.replace(/\/+$/, '') + '/rest/v1/rpc/' + fn, { method: 'POST', headers: headers, body: JSON.stringify(args || {}), signal: ctl.signal });
-  } catch (e) { clearTimeout(to); const err = new Error('Nema veze sa serverom.'); err.net = true; throw err; }
+  } catch (e) { clearTimeout(to); const err = new Error('Keine Verbindung zum Server.'); err.net = true; throw err; }
   clearTimeout(to);
   let body = null; try { body = await res.json(); } catch (e) {}
   if (!res.ok) {
-    const err = new Error((body && body.message) || ('Greška servera (' + res.status + ')'));
+    const err = new Error((body && body.message) || ('Serverfehler (' + res.status + ')'));
     err.status = res.status; if (res.status >= 502 || (res.status === 404 && !(body && body.message))) err.net = true; throw err;
   }
   return body;
 }
-const clean = m => String(m || '').replace(/^(AUTH|FORBIDDEN): /, '');
+const SRV = {
+ 'Pogrešno korisničko ime ili lozinka.':'Benutzername oder Passwort ist falsch.',
+ 'Previše pogrešnih pokušaja. Pokušaj ponovo za 5 minuta.':'Zu viele Fehlversuche. Bitte in 5 Minuten erneut versuchen.',
+ 'Račun je deaktiviran. Obrati se administratoru.':'Das Konto ist deaktiviert. Bitte an den Administrator wenden.',
+ 'Prijava je istekla. Prijavi se ponovo.':'Die Anmeldung ist abgelaufen. Bitte erneut anmelden.',
+ 'Račun nije aktivan.':'Das Konto ist nicht aktiv.',
+ 'Nemaš ovlaštenje za ovu radnju.':'Keine Berechtigung für diese Aktion.',
+ 'Smjena je završena. Prijavi se ponovo.':'Die Schicht ist beendet. Bitte erneut anmelden.',
+ 'Administrator već postoji.':'Es gibt bereits einen Administrator.',
+ 'Unesi ime i korisničko ime (najmanje 3 znaka).':'Name und Benutzername eingeben (mindestens 3 Zeichen).',
+ 'Lozinka mora imati najmanje 6 znakova.':'Das Passwort muss mindestens 6 Zeichen haben.',
+ 'Neispravna operacija.':'Ungültiger Vorgang.','Neispravna pozicija.':'Ungültige Position.','Neispravni podaci unosa.':'Ungültige Eingabedaten.',
+ 'Kopija sadrži neispravne podatke.':'Die Kopie enthält ungültige Daten.','Nepoznata operacija.':'Unbekannter Vorgang.',
+ 'Neispravna uloga.':'Ungültige Rolle.','Neispravan kran.':'Ungültiger Kran.','To korisničko ime već postoji.':'Dieser Benutzername existiert bereits.',
+ 'Korisnik ne postoji.':'Benutzer existiert nicht.','Korisničko ime mora imati najmanje 3 znaka.':'Der Benutzername muss mindestens 3 Zeichen haben.',
+ 'Mora ostati bar jedan aktivan administrator.':'Es muss mindestens ein aktiver Administrator bleiben.',
+ 'Neispravno polje.':'Ungültiges Feld.','Razlog je obavezan.':'Ein Grund ist erforderlich.','Zapis historije ne postoji.':'Historieneintrag existiert nicht.',
+ 'Vrijednost nije promijenjena.':'Der Wert wurde nicht geändert.','Neispravne smjene.':'Ungültige Schichten.',
+ 'Vremena početka moraju biti različita.':'Die Startzeiten müssen verschieden sein.','Kopija ne postoji.':'Kopie existiert nicht.',
+ 'Unos kontejnera':'Container eingegeben','Brisanje kontejnera':'Container gelöscht','Učitana kopija':'Kopie geladen',
+ 'Vraćeno iz kopije':'Aus Kopie wiederhergestellt','Promjena voza':'Zugwechsel','Promjena datuma':'Datumsänderung',
+ 'Izmjena':'Änderung','prazno':'leer','Automatska dnevna kopija':'Automatische Tageskopie'
+};
+const KINDS = { auto: 'automatisch', manual: 'manuell', 'pre-import': 'vor Import', 'pre-restore': 'vor Wiederherstellung' };
+function kindDe(k) { return KINDS[k] || k; }
+function srv(s) {
+  if (s === null || s === undefined) return s;
+  s = String(s); if (SRV[s]) return SRV[s];
+  return s.replace(/ zauzetih polja/g, ' belegte Felder').replace(/^Kopija #(\d+): /, 'Kopie #$1: ')
+    .replace(/^Prije učitavanja kopije \((.*)\)$/, 'Vor dem Laden einer Kopie ($1)')
+    .replace(/^Prije vraćanja kopije #(\d+) \((.*)\)$/, 'Vor dem Wiederherstellen von Kopie #$1 ($2)')
+    .replace(/^Ručna kopija \((.*)\)$/, 'Manuelle Kopie ($1)');
+}
+const clean = m => srv(String(m || '').replace(/^(AUTH|FORBIDDEN): /, ''));
 const isAuth = e => /^AUTH/.test(String(e && e.message || ''));
 
 /* ---------- stanje ---------- */
@@ -1345,12 +1385,12 @@ saveData = function () {
 };
 
 function conflictMsg(op, r) {
-  const where = 'Pozicija ' + op.pos + ' red ' + op.row;
+  const where = 'Position ' + op.pos + ' Reihe ' + op.row;
   const by = r.by ? ' (' + r.by + ')' : '';
-  const t = { occupied: where + ' je u međuvremenu zauzeta' + by + '. Tvoj unos nije spremljen.',
-    full: where + ' je već potpuno popunjena.', empty: where + ' je u međuvremenu obrisana.',
-    changed: where + ' je u međuvremenu promijenjena' + by + '. Tvoj unos nije spremljen.' };
-  showMessage(t[r.conflict] || (where + ': promjena nije primijenjena.'));
+  const t = { occupied: where + ' wurde inzwischen belegt' + by + '. Ihre Eingabe wurde nicht gespeichert.',
+    full: where + ' ist bereits voll belegt.', empty: where + ' wurde inzwischen gelöscht.',
+    changed: where + ' wurde inzwischen geändert' + by + '. Ihre Eingabe wurde nicht gespeichert.' };
+  showMessage(t[r.conflict] || (where + ': Änderung wurde nicht übernommen.'));
 }
 
 async function flushOnce() {
@@ -1394,8 +1434,8 @@ function updateNet() {
   const stale = !!ME && (!online || !lastOk || (Date.now() - lastOk) > 20000);
   const b = $('netBanner'); if (!b) return;
   b.style.display = stale ? 'block' : 'none';
-  b.textContent = (!lastOk && online) ? 'Povezivanje sa serverom…'
-    : 'NEMA VEZE SA SERVEROM – prikazani podaci možda nisu aktuelni.' + (queue.length ? ' Na čekanju: ' + queue.length + ' (šalju se kad se veza vrati).' : '');
+  b.textContent = (!lastOk && online) ? 'Verbindung zum Server wird hergestellt…'
+    : 'KEINE VERBINDUNG ZUM SERVER – angezeigte Daten sind möglicherweise nicht aktuell.' + (queue.length ? ' Ausstehend: ' + queue.length + ' (werden gesendet, sobald die Verbindung wieder da ist).' : '');
   $('sysNet').className = stale ? 'off' : 'on';
   $('tables').classList.toggle('stale', stale);
 }
@@ -1429,45 +1469,45 @@ function updateClock() {
 function overlay(card) { const old = $('loginOverlay'); if (old) old.remove(); $('sysBar').style.display = 'none'; $('netBanner').style.display = 'none'; document.body.appendChild(h('div', { id: 'loginOverlay' }, card)); updateClock(); }
 function showConfig() {
   const url = h('input', { class: 'sys-input', placeholder: 'Project URL (https://xxxx.supabase.co)', value: CFG.url, autocapitalize: 'none' });
-  const key = h('input', { class: 'sys-input', placeholder: 'Ključ (anon / publishable key)', value: CFG.key, autocapitalize: 'none' });
+  const key = h('input', { class: 'sys-input', placeholder: 'Schlüssel (anon / publishable key)', value: CFG.key, autocapitalize: 'none' });
   const err = h('div', { class: 'login-err' });
-  overlay(h('div', { class: 'login-card' }, h('h2', null, 'POSTAVKA SERVERA'),
-    h('p', null, 'Unesi podatke svog Supabase projekta (jednom na ovom tabletu).'), url, key, err,
-    btn('Spremi i poveži', async () => {
+  overlay(h('div', { class: 'login-card' }, h('h2', null, 'SERVER-EINSTELLUNGEN'),
+    h('p', null, 'Daten des Supabase-Projekts eingeben (einmalig auf diesem Tablet).'), url, key, err,
+    btn('Speichern und verbinden', async () => {
       CFG = { url: url.value.trim(), key: key.value.trim() };
-      if (!/^https:\/\//.test(CFG.url) || !CFG.key) { err.textContent = 'Unesi ispravan URL i ključ.'; return; }
+      if (!/^https:\/\//.test(CFG.url) || !CFG.key) { err.textContent = 'Bitte gültige URL und Schlüssel eingeben.'; return; }
       try { await rpc('api_status'); put(CFGKEY, CFG); startup(true); }
-      catch (e) { err.textContent = e.net ? 'Nema veze sa serverom (provjeri URL i internet).' : clean(e.message) + ' – jesi li pokrenuo SQL postavku?'; }
+      catch (e) { err.textContent = e.net ? 'Keine Verbindung zum Server (URL und Internet prüfen).' : clean(e.message) + ' – wurde das SQL-Setup ausgeführt?'; }
     }, 'sys-primary')));
 }
 function showLogin(setup, note) {
   const err = h('div', { class: 'login-err' }, note || '');
-  const card = h('div', { class: 'login-card' }, h('h2', null, 'RASPORED KONTEJNERA – ' + PROGRAM_LABEL), h('div', { class: 'login-clock', id: 'loginClock' }));
+  const card = h('div', { class: 'login-card' }, h('h2', null, 'CONTAINERPLAN – ' + PROGRAM_LABEL), h('div', { class: 'login-clock', id: 'loginClock' }));
   if (setup) {
-    card.appendChild(h('p', null, 'Prvo pokretanje: napravi administratorski račun.'));
-    const nm = h('input', { class: 'sys-input', placeholder: 'Ime i prezime' }), un = h('input', { class: 'sys-input', placeholder: 'Korisničko ime', autocapitalize: 'none', autocomplete: 'off' });
-    const p1 = h('input', { class: 'sys-input', type: 'password', placeholder: 'Lozinka (najmanje 6 znakova)' }), p2 = h('input', { class: 'sys-input', type: 'password', placeholder: 'Ponovi lozinku' });
-    card.append(nm, un, p1, p2, err, btn('Napravi administratora', async () => {
-      if (p1.value !== p2.value) { err.textContent = 'Lozinke se ne podudaraju.'; return; }
+    card.appendChild(h('p', null, 'Erster Start: Administrator-Konto anlegen.'));
+    const nm = h('input', { class: 'sys-input', placeholder: 'Vor- und Nachname' }), un = h('input', { class: 'sys-input', placeholder: 'Benutzername', autocapitalize: 'none', autocomplete: 'off' });
+    const p1 = h('input', { class: 'sys-input', type: 'password', placeholder: 'Passwort (mindestens 6 Zeichen)' }), p2 = h('input', { class: 'sys-input', type: 'password', placeholder: 'Passwort wiederholen' });
+    card.append(nm, un, p1, p2, err, btn('Administrator anlegen', async () => {
+      if (p1.value !== p2.value) { err.textContent = 'Die Passwörter stimmen nicht überein.'; return; }
       try { await rpc('api_setup_admin', { p_name: nm.value, p_username: un.value, p_password: p1.value }); await doLogin(un.value, p1.value, err); }
       catch (e) { err.textContent = clean(e.message); }
     }, 'sys-primary'));
   } else {
-    const un = h('input', { class: 'sys-input', placeholder: 'Korisničko ime', autocapitalize: 'none', autocomplete: 'off' });
-    const pw = h('input', { class: 'sys-input', type: 'password', placeholder: 'Lozinka' });
+    const un = h('input', { class: 'sys-input', placeholder: 'Benutzername', autocapitalize: 'none', autocomplete: 'off' });
+    const pw = h('input', { class: 'sys-input', type: 'password', placeholder: 'Passwort' });
     const go = () => doLogin(un.value, pw.value, err, pw);
     pw.addEventListener('keydown', ev => { if (ev.key === 'Enter') go(); });
-    card.append(un, pw, err, btn('Prijava', go, 'sys-primary'));
+    card.append(un, pw, err, btn('Anmelden', go, 'sys-primary'));
   }
-  card.appendChild(btn('Postavke servera', showConfig, 'sys-link'));
+  card.appendChild(btn('Servereinstellungen', showConfig, 'sys-link'));
   overlay(card);
 }
 async function doLogin(u, p, err, pw) {
   try {
     const r = await rpc('api_login', { p_username: u, p_password: p, p_crane: PROGRAM_LABEL });
-    if (!r.ok) { err.textContent = r.error; if (pw) pw.value = ''; return; }
+    if (!r.ok) { err.textContent = srv(r.error); if (pw) pw.value = ''; return; }
     TOKEN = r.token; ME = r.user; localStorage.setItem(TOKKEY, TOKEN); put(MEKEY, ME); lastOk = 0; enterApp();
-  } catch (e) { err.textContent = e.net ? 'Nema veze sa serverom. Prijava nije moguća.' : clean(e.message); }
+  } catch (e) { err.textContent = e.net ? 'Keine Verbindung zum Server. Anmeldung nicht möglich.' : clean(e.message); }
 }
 async function startup(fresh) {
   if (!CFG.url || !CFG.key) { showConfig(); return; }
@@ -1481,26 +1521,26 @@ async function startup(fresh) {
     TOKEN = ''; ME = null; localStorage.removeItem(TOKKEY); localStorage.removeItem(MEKEY);
   }
   try { const st = await rpc('api_status'); showLogin(!!st.setup_needed); }
-  catch (e) { showLogin(false, e.net ? 'Nema veze sa serverom.' : clean(e.message)); }
+  catch (e) { showLogin(false, e.net ? 'Keine Verbindung zum Server.' : clean(e.message)); }
 }
 
 /* ---------- paneli ---------- */
 function closePanel() { const p = $('sysPanel'); if (p) p.remove(); }
 function openPanel(title, build) {
   closePanel(); const body = h('div', { class: 'sys-body' });
-  document.body.appendChild(h('div', { id: 'sysPanel' }, h('div', { class: 'sys-head' }, h('strong', null, title), btn('Zatvori', closePanel, 'sys-close')), body));
+  document.body.appendChild(h('div', { id: 'sysPanel' }, h('div', { class: 'sys-head' }, h('strong', null, title), btn('Schließen', closePanel, 'sys-close')), body));
   build(body); return body;
 }
 async function act(fn, args, okMsg) {
   try { const r = await rpc(fn, Object.assign({ p_token: TOKEN }, args || {})); if (okMsg) showMessage(okMsg); return r || {}; }
   catch (e) {
-    if (e.net) showMessage('Nema veze sa serverom.'); else if (isAuth(e)) authLost(clean(e.message)); else showMessage(clean(e.message));
+    if (e.net) showMessage('Keine Verbindung zum Server.'); else if (isAuth(e)) authLost(clean(e.message)); else showMessage(clean(e.message));
     return null;
   }
 }
 
 /* ---------- historija ---------- */
-const FIELDS = { user: 'Radnik', crane: 'Kran', pos: 'Pozicija', ts: 'Vrijeme', type: 'Vrsta radnje', prev: 'Prethodno stanje', next: 'Novo stanje' };
+const FIELDS = { user: 'Mitarbeiter', crane: 'Kran', pos: 'Position', ts: 'Zeit', type: 'Aktion', prev: 'Vorheriger Zustand', next: 'Neuer Zustand' };
 function effLog(hist, corr) {
   const by = {}; corr.forEach(c => { (by[c.targetId] = by[c.targetId] || []).push(c); });
   return hist.map(e => { const cs = by[e.id]; if (!cs) return e; const o = Object.assign({}, e, { corrected: true });
@@ -1508,8 +1548,8 @@ function effLog(hist, corr) {
 }
 const posText = e => (e.pos !== null && e.pos !== undefined && e.pos !== '') ? (e.pos + (e.row ? ' ' + e.row : '')) : '—';
 function historyRows(hist, corr, filter) {
-  const rows = effLog(hist, corr).map(e => ({ ts: e.ts, e: e, cells: [fmtDT(e.ts) + (e.corrected ? ' ✎' : ''), e.user, e.crane, posText(e), e.type, e.prev || '', e.next || ''] }));
-  corr.forEach(c => rows.push({ ts: c.ts, cells: [fmtDT(c.ts), c.admin, '', '', 'KOREKCIJA', FIELDS[c.field] + ': ' + (c.field === 'ts' ? fmtDT(Date.parse(c.oldValue)) : c.oldValue),
+  const rows = effLog(hist, corr).map(e => ({ ts: e.ts, e: e, cells: [fmtDT(e.ts) + (e.corrected ? ' ✎' : ''), e.user, e.crane, posText(e), srv(e.type), srv(e.prev || ''), srv(e.next || '')] }));
+  corr.forEach(c => rows.push({ ts: c.ts, cells: [fmtDT(c.ts), c.admin, '', '', 'KORREKTUR', FIELDS[c.field] + ': ' + (c.field === 'ts' ? fmtDT(Date.parse(c.oldValue)) : c.oldValue),
     (c.field === 'ts' ? fmtDT(Date.parse(c.newValue)) : c.newValue) + ' (razlog: ' + c.reason + ')'] }));
   rows.sort((a, b) => b.ts - a.ts);
   const f = (filter || '').toLowerCase().trim();
@@ -1519,31 +1559,31 @@ async function loadHistory(limit) {
   const r = await act('api_history', { p_limit: limit || 500 }); return r ? { hist: r.history || [], corr: r.corrections || [] } : null;
 }
 async function renderHistory(host, onPick) {
-  host.appendChild(h('div', { class: 'sys-note' }, 'Učitavam…'));
-  const d = await loadHistory(isAdmin() ? 5000 : 500); host.innerHTML = ''; if (!d) { host.appendChild(h('div', { class: 'sys-note' }, 'Historija nije dostupna (nema veze).')); return; }
-  const holder = h('div'), inp = h('input', { class: 'sys-input', placeholder: 'Pretraga (radnik, pozicija, radnja, datum…)' });
+  host.appendChild(h('div', { class: 'sys-note' }, 'Wird geladen…'));
+  const d = await loadHistory(isAdmin() ? 5000 : 500); host.innerHTML = ''; if (!d) { host.appendChild(h('div', { class: 'sys-note' }, 'Historie nicht verfügbar (keine Verbindung).')); return; }
+  const holder = h('div'), inp = h('input', { class: 'sys-input', placeholder: 'Suche (Mitarbeiter, Position, Aktion, Datum…)' });
   function draw() {
     holder.innerHTML = ''; const rows = historyRows(d.hist, d.corr, inp.value).slice(0, 500);
-    const heads = ['Vrijeme', 'Radnik', 'Kran', 'Poz.', 'Radnja', 'Prije', 'Poslije']; if (onPick) heads.push('');
-    holder.appendChild(table(heads, rows.map(r => r.cells.concat(onPick ? [r.e ? btn('Ispravi', () => onPick(r.e)) : ''] : []))));
-    holder.appendChild(h('div', { class: 'sys-note' }, 'Prikazano najviše 500 zapisa (najnoviji prvo). ✎ = ispravljeno korekcijom administratora.'));
+    const heads = ['Zeit', 'Mitarbeiter', 'Kran', 'Pos.', 'Aktion', 'Vorher', 'Nachher']; if (onPick) heads.push('');
+    holder.appendChild(table(heads, rows.map(r => r.cells.concat(onPick ? [r.e ? btn('Korrigieren', () => onPick(r.e)) : ''] : []))));
+    holder.appendChild(h('div', { class: 'sys-note' }, 'Maximal 500 Einträge angezeigt (neueste zuerst). ✎ = vom Administrator korrigiert.'));
   }
   inp.addEventListener('input', draw); host.append(inp, holder); draw();
 }
-function openHistory() { openPanel('HISTORIJA', body => { body.appendChild(h('div', { class: 'sys-note' }, 'Pregled je samo za čitanje.')); const host = h('div'); body.appendChild(host); renderHistory(host); }); }
+function openHistory() { openPanel('HISTORIE', body => { body.appendChild(h('div', { class: 'sys-note' }, 'Nur Ansicht (schreibgeschützt).')); const host = h('div'); body.appendChild(host); renderHistory(host); }); }
 
 /* ---------- ADMINISTRATOR ---------- */
 function openAdmin() {
-  if (!isAdmin()) { showMessage('Nemaš ovlaštenje.'); return; }
-  const TABS = [['Korisnici', tabUsers], ['Podaci za prijavu', tabLogins], ['Aktivni radnici', tabActive], ['Historija', tabHist],
-    ['Dnevni izvještaji', tabReports], ['Statistika', tabStats], ['Pregled skladišta', tabWare], ['Korekcije', tabCorr],
-    ['Sigurnosne kopije', tabBackup], ['Podešavanja', tabSettings]];
+  if (!isAdmin()) { showMessage('Keine Berechtigung.'); return; }
+  const TABS = [['Benutzer', tabUsers], ['Anmeldedaten', tabLogins], ['Aktive Mitarbeiter', tabActive], ['Historie', tabHist],
+    ['Tagesberichte', tabReports], ['Statistik', tabStats], ['Lagerübersicht', tabWare], ['Korrekturen', tabCorr],
+    ['Sicherungen', tabBackup], ['Einstellungen', tabSettings]];
   openPanel('ADMINISTRATOR', root => {
     const bar = h('div', { class: 'sys-tabs' }), body = h('div'); root.append(bar, body);
     const btns = TABS.map((t, i) => btn(t[0], () => show(i), 'sys-tab')); btns.forEach(b => bar.appendChild(b));
     async function show(i) {
-      btns.forEach((b, j) => b.classList.toggle('on', i === j)); body.innerHTML = ''; body.appendChild(h('div', { class: 'sys-note' }, 'Učitavam…'));
-      const holder = h('div'); try { await TABS[i][1](holder, () => show(i)); } catch (e) { holder.appendChild(h('div', { class: 'sys-note' }, 'Greška: ' + e.message)); }
+      btns.forEach((b, j) => b.classList.toggle('on', i === j)); body.innerHTML = ''; body.appendChild(h('div', { class: 'sys-note' }, 'Wird geladen…'));
+      const holder = h('div'); try { await TABS[i][1](holder, () => show(i)); } catch (e) { holder.appendChild(h('div', { class: 'sys-note' }, 'Fehler: ' + e.message)); }
       body.innerHTML = ''; body.appendChild(holder);
     }
     show(0);
@@ -1554,39 +1594,39 @@ async function getSessions() { const r = await act('api_admin_sessions'); return
 
 async function tabUsers(body, refresh) {
   const users = await getUsers();
-  const nm = h('input', { class: 'sys-input', placeholder: 'Ime i prezime' }), un = h('input', { class: 'sys-input', placeholder: 'Korisničko ime', autocapitalize: 'none' });
-  const pw = h('input', { class: 'sys-input', placeholder: 'Početna lozinka (najmanje 6 znakova)' });
+  const nm = h('input', { class: 'sys-input', placeholder: 'Vor- und Nachname' }), un = h('input', { class: 'sys-input', placeholder: 'Benutzername', autocapitalize: 'none' });
+  const pw = h('input', { class: 'sys-input', placeholder: 'Anfangspasswort (mindestens 6 Zeichen)' });
   const cr = h('select', { class: 'sys-input' }, h('option', { value: '' }, 'Kran: —'), h('option', { value: 'NORD' }, 'Kran: NORD'), h('option', { value: 'SÜD' }, 'Kran: SÜD'));
   const ad = h('input', { type: 'checkbox' }), ge = h('input', { type: 'checkbox', checked: true });
-  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Novi radnik'), nm, un, pw, cr,
-    h('label', { class: 'sys-check' }, ge, ' GESAMT dozvoljen'), h('label', { class: 'sys-check' }, ad, ' Administrator'),
-    btn('Dodaj radnika', async () => {
-      const r = await act('api_admin_user_create', { p_name: nm.value, p_username: un.value, p_password: pw.value, p_role: ad.checked ? 'admin' : 'worker', p_crane: cr.value, p_gesamt: ge.checked }, 'Radnik je dodan.');
+  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Neuer Mitarbeiter'), nm, un, pw, cr,
+    h('label', { class: 'sys-check' }, ge, ' GESAMT erlaubt'), h('label', { class: 'sys-check' }, ad, ' Administrator'),
+    btn('Mitarbeiter hinzufügen', async () => {
+      const r = await act('api_admin_user_create', { p_name: nm.value, p_username: un.value, p_password: pw.value, p_role: ad.checked ? 'admin' : 'worker', p_crane: cr.value, p_gesamt: ge.checked }, 'Mitarbeiter wurde hinzugefügt.');
       if (r) refresh();
     }, 'sys-primary')));
   const upd = async (u, patch, msg) => { const r = await act('api_admin_user_update', { p_id: u.id, p_patch: patch }, msg); if (r) refresh(); };
-  body.appendChild(table(['Ime', 'Korisničko ime', 'Uloga', 'Kran', 'GESAMT', 'Status', 'Radnje'], users.map(u => [
-    u.name, u.username, u.role === 'admin' ? 'Administrator' : 'Radnik',
+  body.appendChild(table(['Name', 'Benutzername', 'Rolle', 'Kran', 'GESAMT', 'Status', 'Aktionen'], users.map(u => [
+    u.name, u.username, u.role === 'admin' ? 'Administrator' : 'Mitarbeiter',
     (function () { const s = h('select', { class: 'sys-input sys-mini', onchange: () => upd(u, { crane: s.value }) }, ['', 'NORD', 'SÜD'].map(v => h('option', { value: v }, v || '—'))); s.value = u.crane || ''; return s; })(),
     h('input', { type: 'checkbox', checked: u.gesamt !== false, onchange: ev => upd(u, { gesamt: ev.target.checked }) }),
-    u.active ? 'Aktivan' : 'Deaktiviran',
+    u.active ? 'Aktiv' : 'Deaktiviert',
     h('div', { class: 'sys-actions' },
-      btn('Korisničko ime', () => { const v = prompt('Novo korisničko ime za ' + u.name + ':', u.username); if (v !== null) upd(u, { username: v }, 'Korisničko ime je promijenjeno.'); }),
-      btn('Resetuj lozinku', async () => { const v = prompt('Nova lozinka za ' + u.name + ' (najmanje 6 znakova):'); if (v === null) return; await act('api_admin_user_password', { p_id: u.id, p_password: v }, 'Lozinka je promijenjena.'); }),
-      btn(u.active ? 'Deaktiviraj' : 'Aktiviraj', () => upd(u, { active: !u.active })),
-      btn(u.role === 'admin' ? 'Ukloni admina' : 'Postavi admina', () => upd(u, { role: u.role === 'admin' ? 'worker' : 'admin' })))])));
+      btn('Benutzername', () => { const v = prompt('Neuer Benutzername für ' + u.name + ':', u.username); if (v !== null) upd(u, { username: v }, 'Benutzername wurde geändert.'); }),
+      btn('Passwort zurücksetzen', async () => { const v = prompt('Neues Passwort für ' + u.name + ' (mindestens 6 Zeichen):'); if (v === null) return; await act('api_admin_user_password', { p_id: u.id, p_password: v }, 'Passwort wurde geändert.'); }),
+      btn(u.active ? 'Deaktivieren' : 'Aktivieren', () => upd(u, { active: !u.active })),
+      btn(u.role === 'admin' ? 'Admin entziehen' : 'Zum Admin machen', () => upd(u, { role: u.role === 'admin' ? 'worker' : 'admin' })))])));
 }
 async function tabLogins(body) {
   const users = await getUsers();
-  body.appendChild(h('div', { class: 'sys-note' }, 'Lozinke se čuvaju samo kao hash i ne mogu se pročitati. Administrator ih može samo resetovati.'));
-  body.appendChild(table(['Ime i prezime', 'Korisničko ime', 'Kran', 'Status', 'Račun kreiran', 'Posljednja prijava', 'Zadnja promjena lozinke'],
-    users.map(u => [u.name, u.username, u.crane || '—', u.active ? 'Aktivan' : 'Deaktiviran', fmtDT(u.created), u.lastLogin ? fmtDT(u.lastLogin) : '—', u.pwChanged ? fmtDT(u.pwChanged) : '—'])));
+  body.appendChild(h('div', { class: 'sys-note' }, 'Passwörter werden nur als Hash gespeichert und können nicht gelesen werden. Der Administrator kann sie nur zurücksetzen.'));
+  body.appendChild(table(['Vor- und Nachname', 'Benutzername', 'Kran', 'Status', 'Konto erstellt', 'Letzte Anmeldung', 'Letzte Passwortänderung'],
+    users.map(u => [u.name, u.username, u.crane || '—', u.active ? 'Aktiv' : 'Deaktiviert', fmtDT(u.created), u.lastLogin ? fmtDT(u.lastLogin) : '—', u.pwChanged ? fmtDT(u.pwChanged) : '—'])));
 }
 async function tabActive(body) {
   const d = await getSessions();
-  body.appendChild(table(['Radnik', 'Program', 'Kran', 'Prijavljen od', 'Aktivnost', 'Veza sa serverom'],
+  body.appendChild(table(['Mitarbeiter', 'Programm', 'Kran', 'Angemeldet seit', 'Aktivität', 'Serververbindung'],
     d.sessions.filter(s => !s.logoutAt).map(s => { const idle = Math.round((d.now - (s.lastActive || s.loginAt)) / 60000), seen = s.seen ? (d.now - s.seen) / 1000 : 99999;
-      return [s.name, 'LAGER ' + s.crane, s.crane, fmtDT(s.loginAt), idle < 10 ? 'Aktivan' : 'Mirovanje ' + idle + ' min', seen < 20 ? 'Povezan' : 'Bez veze (zadnji signal ' + (s.seen ? fmtT(s.seen) : '—') + ')']; })));
+      return [s.name, 'LAGER ' + s.crane, s.crane, fmtDT(s.loginAt), idle < 10 ? 'Aktiv' : 'Inaktiv ' + idle + ' min', seen < 20 ? 'Verbunden' : 'Keine Verbindung (letztes Signal ' + (s.seen ? fmtT(s.seen) : '—') + ')']; })));
 }
 async function tabHist(body) { await renderHistory(body); }
 
@@ -1601,25 +1641,25 @@ async function tabReports(body) {
   const f = { user: '', crane: '', from: '', to: '', shift: '', q: '' }, list = h('div');
   const sel = (opts, key) => { const s = h('select', { class: 'sys-input', onchange: () => { f[key] = s.value; draw(); } }, opts.map(o => h('option', { value: o[0] }, o[1]))); return s; };
   const dFrom = h('input', { class: 'sys-input', type: 'date', onchange: () => { f.from = dFrom.value; draw(); } }), dTo = h('input', { class: 'sys-input', type: 'date', onchange: () => { f.to = dTo.value; draw(); } });
-  const q = h('input', { class: 'sys-input', placeholder: 'Pretraga po imenu', oninput: () => { f.q = q.value; draw(); } });
-  body.appendChild(h('div', { class: 'sys-filters' }, sel([['', 'Svi radnici']].concat(users.map(u => [u.id, u.name])), 'user'), sel([['', 'Oba krana'], ['NORD', 'NORD'], ['SÜD', 'SÜD']], 'crane'),
-    sel([['', 'Sve smjene']].concat(shifts.map(s => [s, s])), 'shift'), h('label', null, 'Od ', dFrom), h('label', null, 'Do ', dTo), q));
+  const q = h('input', { class: 'sys-input', placeholder: 'Suche nach Name', oninput: () => { f.q = q.value; draw(); } });
+  body.appendChild(h('div', { class: 'sys-filters' }, sel([['', 'Alle Mitarbeiter']].concat(users.map(u => [u.id, u.name])), 'user'), sel([['', 'Beide Kräne'], ['NORD', 'NORD'], ['SÜD', 'SÜD']], 'crane'),
+    sel([['', 'Alle Schichten']].concat(shifts.map(s => [s, s])), 'shift'), h('label', null, 'Von ', dFrom), h('label', null, 'Bis ', dTo), q));
   body.appendChild(list);
   function draw() {
     list.innerHTML = '';
     const rows = sd.sessions.filter(s => (!f.user || s.userId === f.user) && (!f.crane || s.crane === f.crane) && (!f.shift || s.shiftName === f.shift) &&
       (!f.from || s.shiftDay >= f.from) && (!f.to || s.shiftDay <= f.to) && (!f.q || s.name.toLowerCase().indexOf(f.q.toLowerCase()) >= 0));
-    list.appendChild(table(['Radnik', 'Datum smjene', 'Smjena', 'Kran', 'Početak', 'Kraj', 'Unosa', 'Brisanja', 'Ostalo', ''], rows.map(s => { const g = sessionStats(s, es);
-      return [s.name, fmtDay(s.shiftDay), s.shiftName, s.crane, fmtT(s.loginAt), s.logoutAt ? fmtT(s.logoutAt) + (s.auto ? ' (auto)' : '') : 'u toku', g.unos, g.brisanje, g.ostalo, btn('Detalji', () => detail(s))]; })));
-    list.appendChild(h('div', { class: 'sys-note' }, 'Izvještaj se automatski pravi za svaku smjenu i ostaje sačuvan na serveru. Zaboravljena odjava se zatvara na kraju smjene (oznaka „auto“).'));
+    list.appendChild(table(['Mitarbeiter', 'Schichtdatum', 'Schicht', 'Kran', 'Beginn', 'Ende', 'Eingaben', 'Löschungen', 'Sonstiges', ''], rows.map(s => { const g = sessionStats(s, es);
+      return [s.name, fmtDay(s.shiftDay), s.shiftName, s.crane, fmtT(s.loginAt), s.logoutAt ? fmtT(s.logoutAt) + (s.auto ? ' (auto)' : '') : 'laufend', g.unos, g.brisanje, g.ostalo, btn('Details', () => detail(s))]; })));
+    list.appendChild(h('div', { class: 'sys-note' }, 'Der Bericht wird automatisch für jede Schicht erstellt und bleibt auf dem Server gespeichert. Eine vergessene Abmeldung wird am Schichtende geschlossen (Kennzeichnung „auto“).'));
   }
   function detail(s) {
     body.innerHTML = ''; const g = sessionStats(s, es);
-    body.appendChild(btn('‹ Nazad na izvještaje', () => { body.innerHTML = ''; tabReports(body); }));
-    body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Izvještaj smjene: ' + s.shiftName + ' – ' + fmtDay(s.shiftDay)), h('div', null, 'Radnik: ' + s.name), h('div', null, 'Kran: ' + s.crane),
-      h('div', null, 'Rad od ' + fmtDT(s.loginAt) + ' do ' + (s.logoutAt ? fmtDT(s.logoutAt) : 'u toku')),
-      h('div', null, 'Uneseno: ' + g.unos + ' · Obrisano: ' + g.brisanje + ' · Ostale izmjene: ' + g.ostalo), h('div', null, 'Pozicije: ' + g.positions)));
-    body.appendChild(table(['Vrijeme', 'Poz.', 'Radnja', 'Prije', 'Poslije'], g.entries.map(e => [fmtDT(e.ts) + (e.corrected ? ' ✎' : ''), posText(e), e.type, e.prev || '', e.next || ''])));
+    body.appendChild(btn('‹ Zurück zu den Berichten', () => { body.innerHTML = ''; tabReports(body); }));
+    body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Schichtbericht: ' + s.shiftName + ' – ' + fmtDay(s.shiftDay)), h('div', null, 'Mitarbeiter: ' + s.name), h('div', null, 'Kran: ' + s.crane),
+      h('div', null, 'Arbeit von ' + fmtDT(s.loginAt) + ' bis ' + (s.logoutAt ? fmtDT(s.logoutAt) : 'jetzt')),
+      h('div', null, 'Eingegeben: ' + g.unos + ' · Gelöscht: ' + g.brisanje + ' · Sonstige Änderungen: ' + g.ostalo), h('div', null, 'Positionen: ' + g.positions)));
+    body.appendChild(table(['Zeit', 'Pos.', 'Aktion', 'Vorher', 'Nachher'], g.entries.map(e => [fmtDT(e.ts) + (e.corrected ? ' ✎' : ''), posText(e), srv(e.type), srv(e.prev || ''), srv(e.next || '')])));
   }
   draw();
 }
@@ -1627,33 +1667,33 @@ async function tabStats(body) {
   const hd = await loadHistory(20000), es = hd ? effLog(hd.hist, hd.corr) : [];
   const sd = await getSessions(), shiftOf = {}; sd.sessions.forEach(s => { shiftOf[s.id] = s.shiftName; });
   const group = fn => { const m = {}; es.forEach(e => { const k = fn(e); m[k] = m[k] || { u: 0, b: 0, o: 0 }; if (e.type === 'Unos kontejnera') m[k].u++; else if (e.type === 'Brisanje kontejnera') m[k].b++; else m[k].o++; }); return m; };
-  const block = (title, m) => { body.appendChild(h('h3', { class: 'sys-h3' }, title)); body.appendChild(table(['', 'Uneseno', 'Obrisano', 'Ostale izmjene'], Object.keys(m).sort().map(k => [k, m[k].u, m[k].b, m[k].o]))); };
-  block('Ukupno', group(() => 'UKUPNO')); block('Po radnicima', group(e => e.user)); block('Po kranovima', group(e => e.crane));
-  block('Po danima', group(e => fmtDay(dayKey(e.ts)))); block('Po smjenama', group(e => shiftOf[e.sessionId] || 'nepoznato'));
-  body.appendChild(h('div', { class: 'sys-note' }, 'Statistika se računa iz evidentiranih događaja (u skladu s dnevnim čišćenjem, ako je uključeno). Premještanje kao posebna radnja u programu ne postoji.'));
+  const block = (title, m) => { body.appendChild(h('h3', { class: 'sys-h3' }, title)); body.appendChild(table(['', 'Eingegeben', 'Gelöscht', 'Sonstige Änderungen'], Object.keys(m).sort().map(k => [k, m[k].u, m[k].b, m[k].o]))); };
+  block('Gesamt', group(() => 'SUMME')); block('Pro Mitarbeiter', group(e => e.user)); block('Pro Kran', group(e => e.crane));
+  block('Pro Tag', group(e => fmtDay(dayKey(e.ts)))); block('Pro Schicht', group(e => shiftOf[e.sessionId] || 'unbekannt'));
+  body.appendChild(h('div', { class: 'sys-note' }, 'Die Statistik wird aus den erfassten Ereignissen berechnet (abhängig von der täglichen Bereinigung, falls aktiv). Verschieben als eigene Aktion gibt es im Programm nicht.'));
 }
 async function tabWare(body) {
   const rows = []; Object.keys(data).forEach(k => { const it = data[k], p = k.split('-'); rows.push([Number(p[1]), p[0], it]); });
   rows.sort((a, b) => a[0] - b[0] || a[1].localeCompare(b[1]));
   ALL_RANGES.forEach(r => { const mine = rows.filter(x => x[0] >= r[1] && x[0] <= r[2]); let c = 0; mine.forEach(x => { c += x[2].count; });
-    body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, r[0] + ' (' + r[1] + '–' + r[2] + ')'), h('div', null, 'Zauzetih polja: ' + mine.length + ' od ' + (r[2] - r[1] + 1) * 2 + ' · Kontejnera: ' + c))); });
-  body.appendChild(table(['Poz.', 'Red', 'Voz', 'Datum', 'Veličina', 'Broj'], rows.map(x => [x[0], x[1], x[2].driver, formatDate(x[2].date), x[2].size + ' stopa', x[2].count + '/' + x[2].max])));
+    body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, r[0] + ' (' + r[1] + '–' + r[2] + ')'), h('div', null, 'Belegte Felder: ' + mine.length + ' von ' + (r[2] - r[1] + 1) * 2 + ' · Container: ' + c))); });
+  body.appendChild(table(['Pos.', 'Reihe', 'Zug', 'Datum', 'Größe', 'Anzahl'], rows.map(x => [x[0], x[1], x[2].driver, formatDate(x[2].date), x[2].size + ' Fuß', x[2].count + '/' + x[2].max])));
 }
 async function tabCorr(body) {
-  body.appendChild(h('div', { class: 'sys-note' }, 'Original ostaje sačuvan. Svaka korekcija pravi novi zapis (ko, kada, staro, novo, razlog).'));
+  body.appendChild(h('div', { class: 'sys-note' }, 'Das Original bleibt erhalten. Jede Korrektur erzeugt einen neuen Eintrag (wer, wann, alt, neu, Grund).'));
   const host = h('div'); body.appendChild(host);
   await renderHistory(host, e => {
-    body.innerHTML = ''; body.appendChild(btn('‹ Nazad', () => { body.innerHTML = ''; tabCorr(body); }));
+    body.innerHTML = ''; body.appendChild(btn('‹ Zurück', () => { body.innerHTML = ''; tabCorr(body); }));
     const fld = h('select', { class: 'sys-input' }, Object.keys(FIELDS).map(k => h('option', { value: k }, FIELDS[k])));
-    const val = h('input', { class: 'sys-input' }), reason = h('textarea', { class: 'sys-input', placeholder: 'Razlog korekcije (obavezno)', rows: 3 }), err = h('div', { class: 'login-err' });
+    const val = h('input', { class: 'sys-input' }), reason = h('textarea', { class: 'sys-input', placeholder: 'Grund der Korrektur (erforderlich)', rows: 3 }), err = h('div', { class: 'login-err' });
     const cur = () => { const k = fld.value; if (k === 'ts') { const p = bp(e.ts); val.type = 'datetime-local'; val.value = p.y + '-' + pad(p.mo) + '-' + pad(p.d) + 'T' + pad(p.h) + ':' + pad(p.mi); } else { val.type = 'text'; val.value = (e[k] === undefined || e[k] === null) ? '' : e[k]; } };
     fld.addEventListener('change', cur); cur();
-    body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Korekcija: ' + fmtDT(e.ts) + ' · ' + e.user + ' · ' + e.type + ' · ' + posText(e)), fld, val, reason, err,
-      btn('Sačuvaj korekciju', async () => {
-        if (!reason.value.trim()) { err.textContent = 'Razlog je obavezan.'; return; }
+    body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Korrektur: ' + fmtDT(e.ts) + ' · ' + e.user + ' · ' + srv(e.type) + ' · ' + posText(e)), fld, val, reason, err,
+      btn('Korrektur speichern', async () => {
+        if (!reason.value.trim()) { err.textContent = 'Ein Grund ist erforderlich.'; return; }
         let nv = val.value;
-        if (fld.value === 'ts') { const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(nv); if (!m) { err.textContent = 'Neispravan datum.'; return; } nv = new Date(berlinToTs(+m[1], +m[2], +m[3], +m[4], +m[5])).toISOString(); }
-        const r = await act('api_admin_correct', { p_history_id: e.id, p_field: fld.value, p_new: nv, p_reason: reason.value }, 'Korekcija je sačuvana.');
+        if (fld.value === 'ts') { const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(nv); if (!m) { err.textContent = 'Ungültiges Datum.'; return; } nv = new Date(berlinToTs(+m[1], +m[2], +m[3], +m[4], +m[5])).toISOString(); }
+        const r = await act('api_admin_correct', { p_history_id: e.id, p_field: fld.value, p_new: nv, p_reason: reason.value }, 'Korrektur wurde gespeichert.');
         if (r) { body.innerHTML = ''; tabCorr(body); }
       }, 'sys-primary')));
   });
@@ -1664,25 +1704,25 @@ function download(name, obj) {
 }
 async function tabBackup(body, refresh) {
   const r = await act('api_admin_backups'), list = r ? r.backups : [];
-  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Kopije na serveru'),
-    h('div', { class: 'sys-note' }, 'Server sam pravi kopiju jednom dnevno (čuva se zadnjih 30) i prije svakog učitavanja ili vraćanja kopije.'),
-    btn('Spremi kopiju sada', async () => { if (await act('api_admin_backup_now', {}, 'Kopija je spremljena.')) refresh(); }, 'sys-primary')));
-  body.appendChild(table(['Datum', 'Vrsta', 'Opis', 'Zauzetih polja', ''], list.map(b => [fmtDT(b.createdAt), b.kind, b.note || '', b.containers,
+  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Kopien auf dem Server'),
+    h('div', { class: 'sys-note' }, 'Der Server erstellt einmal täglich automatisch eine Kopie (die letzten 30 werden aufbewahrt) sowie vor jedem Laden oder Wiederherstellen einer Kopie.'),
+    btn('Kopie jetzt speichern', async () => { if (await act('api_admin_backup_now', {}, 'Kopie wurde gespeichert.')) refresh(); }, 'sys-primary')));
+  body.appendChild(table(['Datum', 'Art', 'Beschreibung', 'Belegte Felder', ''], list.map(b => [fmtDT(b.createdAt), kindDe(b.kind), srv(b.note || ''), b.containers,
     h('div', { class: 'sys-actions' },
-      btn('Preuzmi', async () => { const g = await act('api_admin_backup_get', { p_id: b.id }); if (g) download('kopija-server-' + b.id + '.json', g.backup); }),
-      btn('Vrati kontejnere', async () => { if (!confirm('Vratiti stanje kontejnera iz ove kopije? Trenutno stanje se prije toga automatski sprema.')) return; if (await act('api_admin_restore', { p_id: b.id }, 'Kontejneri su vraćeni.')) { refresh(); sync(); } }))])));
+      btn('Herunterladen', async () => { const g = await act('api_admin_backup_get', { p_id: b.id }); if (g) download('kopija-server-' + b.id + '.json', g.backup); }),
+      btn('Container wiederherstellen', async () => { if (!confirm('Containerbestand aus dieser Kopie wiederherstellen? Der aktuelle Stand wird vorher automatisch gesichert.')) return; if (await act('api_admin_restore', { p_id: b.id }, 'Container wurden wiederhergestellt.')) { refresh(); sync(); } }))])));
 }
 async function tabSettings(body) {
   const r = await act('api_admin_settings', {}); if (!r) return;
   const rows = r.shifts.map(s => ({ n: h('input', { class: 'sys-input', value: s.name }), t: h('input', { class: 'sys-input', type: 'time', value: s.start }) }));
   const dc = h('input', { type: 'checkbox', checked: r.dailyClear });
-  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Smjene (njemačko vrijeme)'), rows.map(x => h('div', { class: 'sys-row' }, x.n, x.t)),
-    h('label', { class: 'sys-check' }, dc, ' Svaki dan obriši historiju i izvještaje prethodnih dana (kontejneri ostaju; kopija se prije toga automatski sprema)'),
-    h('div', { class: 'sys-note' }, 'Zadnje dnevno čišćenje: ' + (r.lastClear ? fmtDay(r.lastClear) : '—')),
-    btn('Sačuvaj podešavanja', () => act('api_admin_settings', { p_shifts: rows.map(x => ({ name: x.n.value.trim(), start: x.t.value })), p_daily_clear: dc.checked }, 'Podešavanja su sačuvana.'), 'sys-primary')));
-  const p1 = h('input', { class: 'sys-input', type: 'password', placeholder: 'Nova lozinka (najmanje 6 znakova)' });
-  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Moja lozinka'), p1,
-    btn('Promijeni lozinku', async () => { if (await act('api_admin_user_password', { p_id: ME.id, p_password: p1.value }, 'Lozinka je promijenjena.')) p1.value = ''; })));
+  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Schichten (deutsche Zeit)'), rows.map(x => h('div', { class: 'sys-row' }, x.n, x.t)),
+    h('label', { class: 'sys-check' }, dc, ' Täglich Historie und Berichte der Vortage löschen (Container bleiben erhalten; vorher wird automatisch eine Kopie gespeichert)'),
+    h('div', { class: 'sys-note' }, 'Letzte tägliche Bereinigung: ' + (r.lastClear ? fmtDay(r.lastClear) : '—')),
+    btn('Einstellungen speichern', () => act('api_admin_settings', { p_shifts: rows.map(x => ({ name: x.n.value.trim(), start: x.t.value })), p_daily_clear: dc.checked }, 'Einstellungen wurden gespeichert.'), 'sys-primary')));
+  const p1 = h('input', { class: 'sys-input', type: 'password', placeholder: 'Neues Passwort (mindestens 6 Zeichen)' });
+  body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, 'Mein Passwort'), p1,
+    btn('Passwort ändern', async () => { if (await act('api_admin_user_password', { p_id: ME.id, p_password: p1.value }, 'Passwort wurde geändert.')) p1.value = ''; })));
 }
 
 /* ---------- pokretanje ---------- */

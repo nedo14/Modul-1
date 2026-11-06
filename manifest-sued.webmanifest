@@ -1,14 +1,14 @@
 {
  "id": "./sued.html",
- "name": "Raspored kontejnera – SÜD",
+ "name": "Containerplan – SÜD",
  "short_name": "Lager SÜD",
  "start_url": "./sued.html",
  "scope": "./",
  "display": "standalone",
  "orientation": "any",
- "background_color": "#172d40",
- "theme_color": "#172d40",
- "lang": "hr",
+ "background_color": "#ffffff",
+ "theme_color": "#ffffff",
+ "lang": "de",
  "icons": [
   {
    "src": "icon-sued-192.png",

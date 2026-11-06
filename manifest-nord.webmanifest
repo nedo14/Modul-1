@@ -1,14 +1,14 @@
 {
  "id": "./nord.html",
- "name": "Raspored kontejnera – NORD",
+ "name": "Containerplan – NORD",
  "short_name": "Lager NORD",
  "start_url": "./nord.html",
  "scope": "./",
  "display": "standalone",
  "orientation": "any",
- "background_color": "#172d40",
- "theme_color": "#172d40",
- "lang": "hr",
+ "background_color": "#ffffff",
+ "theme_color": "#ffffff",
+ "lang": "de",
  "icons": [
   {
    "src": "icon-nord-192.png",
