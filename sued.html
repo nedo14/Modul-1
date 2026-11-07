@@ -488,8 +488,7 @@ html, body { background: #ffffff !important; color-scheme: light; }
 </div>
 
 <div class="actions">
-<button onclick="exportBackup()">Kopie speichern</button>
-<button onclick="document.getElementById('backupFile').click()">Kopie laden</button>
+<button id="clearBtn" type="button">Liste leeren</button>
 <button id="gesamtBtn" onclick="toggleGesamt()">GESAMT</button>
 <button id="histBtn" type="button">Historie</button>
 <button id="adminBtn" type="button" style="display:none">ADMINISTRATOR</button>
@@ -502,7 +501,8 @@ style="display:none" onchange="importBackup(event)">
 
 <div class="hint">
 Tippen auf ein freies Feld = neue Eingabe. Tippen auf ein belegtes Feld = Container hinzufügen.
-Feld 2 Sekunden gedrückt halten = löschen.
+Doppeltippen auf ein belegtes Feld = ein Container weniger. Doppeltippen auf ein freies Feld = Feld sperren.
+Feld 2 Sekunden gedrückt halten = löschen bzw. Sperre aufheben.
 </div>
 
 <div class="summary-title">CONTAINER PRO ZUG</div>
@@ -562,7 +562,7 @@ Feld 2 Sekunden gedrückt halten = löschen.
 
 "use strict";
 
-const STORAGE_KEY = "containerRoster_v2";
+const STORAGE_KEY = "containerRoster_v2_" + (document.title.indexOf("SÜD") >= 0 ? "SUED" : "NORD");
 const PROGRAM_LABEL = "SÜD";
 const RANGE_FROM = 31;
 const RANGE_TO = 58;
@@ -1306,7 +1306,8 @@ buildTables();
 (function () {
 'use strict';
 
-const CFGKEY = 'cr_cfg', TOKKEY = 'cr_token', QKEY = 'cr_queue', MEKEY = 'cr_me';
+const PKEY = (PROGRAM_LABEL === 'SÜD' ? 'sued' : 'nord');
+const CFGKEY = 'cr_cfg', TOKKEY = 'cr_token_' + PKEY, QKEY = 'cr_queue_' + PKEY, MEKEY = 'cr_me_' + PKEY;
 const get = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
 const put = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
 const $ = id => document.getElementById(id);
@@ -1387,7 +1388,7 @@ const SRV = {
  'Unesi ime i korisničko ime (najmanje 3 znaka).':'Name und Benutzername eingeben (mindestens 3 Zeichen).',
  'Lozinka mora imati najmanje 6 znakova.':'Das Passwort muss mindestens 6 Zeichen haben.',
  'Neispravna operacija.':'Ungültiger Vorgang.','Neispravna pozicija.':'Ungültige Position.','Neispravni podaci unosa.':'Ungültige Eingabedaten.',
- 'Kopija sadrži neispravne podatke.':'Die Kopie enthält ungültige Daten.','Nepoznata operacija.':'Unbekannter Vorgang.',
+ 'Kopija sadrži neispravne podatke.':'Die Kopie enthält ungültige Daten.','Nepoznata operacija.':'Unbekannter Vorgang.','Neispravan raspon.':'Ungültiger Bereich.',
  'Neispravna uloga.':'Ungültige Rolle.','Neispravan kran.':'Ungültiger Kran.','To korisničko ime već postoji.':'Dieser Benutzername existiert bereits.',
  'Korisnik ne postoji.':'Benutzer existiert nicht.','Korisničko ime mora imati najmanje 3 znaka.':'Der Benutzername muss mindestens 3 Zeichen haben.',
  'Mora ostati bar jedan aktivan administrator.':'Es muss mindestens ein aktiver Administrator bleiben.',
@@ -1429,6 +1430,7 @@ function applyLocal(map, o) {
   if (o.type === 'new') { if (!map[k]) map[k] = { size: o.size, driver: o.driver, date: o.date, count: 1, max: o.size === 20 ? 6 : 3 }; }
   else if (o.type === 'inc') { const it = map[k]; if (it && it.count < it.max) it.count++; }
   else if (o.type === 'delete') { delete map[k]; }
+  else if (o.type === 'clear') { Object.keys(map).forEach(x => { const p = Number(x.split('-')[1]); if (p >= o.from && p <= o.to) delete map[x]; }); }
   else if (o.type === 'block') { if (!map[k]) map[k] = { size: 40, driver: 'GESPERRT', date: o.date, count: 1, max: 1 }; }
   else if (o.type === 'dec') { const it = map[k]; if (it && it.driver === o.driver && it.date === o.date && it.size === o.size) { if (it.count > 1) it.count--; else delete map[k]; } }
   else if (o.type === 'import') { Object.keys(map).forEach(x => { delete map[x]; }); (o.data || []).forEach(c => { map[c.row + '-' + c.pos] = { size: c.size, driver: c.driver, date: c.date, count: c.count, max: c.max }; }); }
@@ -1802,10 +1804,22 @@ async function tabSettings(body) {
     btn('Passwort ändern', async () => { if (await act('api_admin_user_password', { p_id: ME.id, p_password: p1.value }, 'Passwort wurde geändert.')) p1.value = ''; })));
 }
 
+/* ---------- Liste leeren (neue Liste beginnen) ---------- */
+function clearList() {
+  if (!ME) return;
+  const mine = Object.keys(data).filter(k => { const p = Number(k.split('-')[1]); return p >= RANGE_FROM && p <= RANGE_TO; });
+  if (!mine.length) { showMessage('Die Liste ist bereits leer.'); return; }
+  if (!confirm('Alle ' + mine.length + ' belegten Felder von ' + PROGRAM_LABEL + ' (Position ' + RANGE_FROM + '–' + RANGE_TO + ') leeren und eine neue Liste beginnen?\n\nDer alte Stand bleibt in der Historie gespeichert.')) return;
+  const op = makeOp('clear', { from: RANGE_FROM, to: RANGE_TO });
+  queue.push(op); saveQ(); applyLocal(data, op); snap = clone(data); origSave(); renderAll();
+  showMessage('Neue Liste begonnen.'); sync();
+}
+
 /* ---------- pokretanje ---------- */
 $('sysLogout').addEventListener('click', logout);
 $('histBtn').addEventListener('click', openHistory);
 $('adminBtn').addEventListener('click', openAdmin);
+$('clearBtn').addEventListener('click', clearList);
 ['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { lastActive = Date.now(); }, true));
 setInterval(() => { updateClock(); updateNet(); }, 1000);
 setInterval(() => { if (ME) sync(); }, 3000);
