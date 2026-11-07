@@ -463,6 +463,10 @@ text-align: center; padding: 7px 8px; border-radius: 7px; margin-bottom: 6px;
 html, body { background: #ffffff !important; color-scheme: light; }
 #loginOverlay { background: #ffffff !important; }
 .login-card { border: 1px solid #bac7d0; box-shadow: 0 2px 14px rgba(0,0,0,0.12); }
+
+/* gesperrtes Feld (schwarz) und kein Zoom beim Doppeltippen */
+.position { touch-action: manipulation; }
+.position.blocked { background: #000000 !important; border-color: #000000; }
 </style>
 </head>
 
@@ -628,8 +632,8 @@ const item = source[key];
 if (!item || typeof item !== "object") return;
 const size = Number(item.size);
 if (size !== 20 && size !== 40) return;
-if (drivers.indexOf(item.driver) === -1) return;
-const max = size === 20 ? 6 : 3;
+if (item.driver !== "GESPERRT" && drivers.indexOf(item.driver) === -1) return;
+const max = item.driver === "GESPERRT" ? 1 : (size === 20 ? 6 : 3);
 let count = Math.round(Number(item.count));
 if (!(count >= 1)) return;
 if (count > max) count = max;
@@ -801,8 +805,58 @@ longPressTriggered = false;
 return;
 }
 
-handlePosition(box.dataset.key, box.dataset.row, box.dataset.sp);
+const k = box.dataset.key, rw = box.dataset.row, spn = box.dataset.sp;
+const nowT = Date.now();
+
+if (box._tapTimer && nowT - box._tapAt < 340) {
+clearTimeout(box._tapTimer);
+box._tapTimer = null;
+box._tapAt = 0;
+handleDoubleTap(k, rw, spn);
+return;
+}
+
+box._tapAt = nowT;
+box._tapTimer = setTimeout(function() {
+box._tapTimer = null;
+handlePosition(k, rw, spn);
+}, 340);
 });
+}
+
+function todayBerlin() {
+return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin" }).format(new Date());
+}
+
+// Doppeltippen: leeres Feld = sperren (schwarz), belegtes Feld = einen Container entfernen.
+function handleDoubleTap(key, row, sp) {
+const item = data[key];
+
+if (!item) {
+data[key] = { size: 40, driver: "GESPERRT", date: todayBerlin(), count: 1, max: 1 };
+saveData();
+renderPosition(key);
+showMessage("Feld gesperrt. Zum Freigeben 2 Sekunden gedrückt halten.");
+return;
+}
+
+if (item.driver === "GESPERRT") {
+showMessage("Feld ist gesperrt. Zum Freigeben 2 Sekunden gedrückt halten.");
+return;
+}
+
+window.crHint = "dec";
+
+if (item.count > 1) {
+item.count--;
+} else {
+delete data[key];
+}
+
+saveData();
+window.crHint = null;
+renderPosition(key);
+showMessage("Ein Container wurde entfernt.");
 }
 
 function handlePosition(key, row, sp) {
@@ -810,6 +864,11 @@ const item = data[key];
 
 if (!item) {
 openDialog(row, sp);
+return;
+}
+
+if (item.driver === "GESPERRT") {
+showMessage("Feld ist gesperrt. Zum Freigeben 2 Sekunden gedrückt halten.");
 return;
 }
 
@@ -1052,6 +1111,17 @@ if (oldCount) oldCount.remove();
 return;
 }
 
+if (item.driver === "GESPERRT") {
+box.className = "position blocked";
+box.style.backgroundColor = "#000000";
+box.querySelector(".fill").style.backgroundColor = "transparent";
+box.querySelector(".fill").style.width = "0%";
+box.querySelector(".inside").innerHTML = "";
+const oc = box.querySelector(".count");
+if (oc) oc.remove();
+return;
+}
+
 const percentage = Math.min(100, (item.count / item.max) * 100);
 
 box.className = "position" + (item.count >= item.max ? " full" : "");
@@ -1101,7 +1171,7 @@ const item = data[key];
 if (item && item.count > 0 && isVisibleKey(key)) {
 occupied++;
 
-const amount = Number(item.count) || 0;
+const amount = item.driver === "GESPERRT" ? 0 : (Number(item.count) || 0);
 containers += amount;
 
 if (driverCounts[item.driver] !== undefined) {
@@ -1357,6 +1427,8 @@ function applyLocal(map, o) {
   if (o.type === 'new') { if (!map[k]) map[k] = { size: o.size, driver: o.driver, date: o.date, count: 1, max: o.size === 20 ? 6 : 3 }; }
   else if (o.type === 'inc') { const it = map[k]; if (it && it.count < it.max) it.count++; }
   else if (o.type === 'delete') { delete map[k]; }
+  else if (o.type === 'block') { if (!map[k]) map[k] = { size: 40, driver: 'GESPERRT', date: o.date, count: 1, max: 1 }; }
+  else if (o.type === 'dec') { const it = map[k]; if (it && it.driver === o.driver && it.date === o.date && it.size === o.size) { if (it.count > 1) it.count--; else delete map[k]; } }
   else if (o.type === 'import') { Object.keys(map).forEach(x => { delete map[x]; }); (o.data || []).forEach(c => { map[c.row + '-' + c.pos] = { size: c.size, driver: c.driver, date: c.date, count: c.count, max: c.max }; }); }
 }
 
@@ -1367,10 +1439,13 @@ function diffToOps() {
   keys.forEach(k => {
     const a = snap[k], b = data[k]; if (JSON.stringify(a) === JSON.stringify(b)) return;
     const p = k.split('-'), base = { row: p[0], pos: Number(p[1]) };
-    if (!a && b) queue.push(makeOp('new', Object.assign({ size: b.size, driver: b.driver, date: b.date }, base)));
-    else if (a && !b) queue.push(makeOp('delete', base));
-    else if (a.driver === b.driver && a.date === b.date && a.size === b.size && b.count > a.count)
+    const same = a && b && a.driver === b.driver && a.date === b.date && a.size === b.size;
+    if (!a && b) queue.push(b.driver === 'GESPERRT' ? makeOp('block', Object.assign({ date: b.date }, base)) : makeOp('new', Object.assign({ size: b.size, driver: b.driver, date: b.date }, base)));
+    else if (a && !b) queue.push(window.crHint === 'dec' && a.driver !== 'GESPERRT' ? makeOp('dec', Object.assign({ size: a.size, driver: a.driver, date: a.date }, base)) : makeOp('delete', base));
+    else if (same && b.count > a.count)
       queue.push(makeOp('inc', Object.assign({ size: a.size, driver: a.driver, date: a.date }, base)));
+    else if (same && b.count < a.count)
+      queue.push(makeOp('dec', Object.assign({ size: a.size, driver: a.driver, date: a.date }, base)));
     else { queue.push(makeOp('delete', base)); queue.push(makeOp('new', Object.assign({ size: b.size, driver: b.driver, date: b.date }, base))); }
   });
   snap = clone(data); saveQ();
@@ -1675,9 +1750,9 @@ async function tabStats(body) {
 async function tabWare(body) {
   const rows = []; Object.keys(data).forEach(k => { const it = data[k], p = k.split('-'); rows.push([Number(p[1]), p[0], it]); });
   rows.sort((a, b) => a[0] - b[0] || a[1].localeCompare(b[1]));
-  ALL_RANGES.forEach(r => { const mine = rows.filter(x => x[0] >= r[1] && x[0] <= r[2]); let c = 0; mine.forEach(x => { c += x[2].count; });
+  ALL_RANGES.forEach(r => { const mine = rows.filter(x => x[0] >= r[1] && x[0] <= r[2]); let c = 0; mine.forEach(x => { c += x[2].driver === 'GESPERRT' ? 0 : x[2].count; });
     body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, r[0] + ' (' + r[1] + '–' + r[2] + ')'), h('div', null, 'Belegte Felder: ' + mine.length + ' von ' + (r[2] - r[1] + 1) * 2 + ' · Container: ' + c))); });
-  body.appendChild(table(['Pos.', 'Reihe', 'Zug', 'Datum', 'Größe', 'Anzahl'], rows.map(x => [x[0], x[1], x[2].driver, formatDate(x[2].date), x[2].size + ' Fuß', x[2].count + '/' + x[2].max])));
+  body.appendChild(table(['Pos.', 'Reihe', 'Zug', 'Datum', 'Größe', 'Anzahl'], rows.map(x => x[2].driver === 'GESPERRT' ? [x[0], x[1], 'GESPERRT', '—', '—', '—'] : [x[0], x[1], x[2].driver, formatDate(x[2].date), x[2].size + ' Fuß', x[2].count + '/' + x[2].max])));
 }
 async function tabCorr(body) {
   body.appendChild(h('div', { class: 'sys-note' }, 'Das Original bleibt erhalten. Jede Korrektur erzeugt einen neuen Eintrag (wer, wann, alt, neu, Grund).'));
@@ -1743,7 +1818,7 @@ startup(false);
 
 <script>
 if ('serviceWorker' in navigator && /^https?:/.test(location.protocol)) {
-  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });
+  window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js', { scope: './nord.html' }).catch(function () {}); });
 }
 </script>
 </body>

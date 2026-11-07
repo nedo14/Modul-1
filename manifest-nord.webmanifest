@@ -3,7 +3,7 @@
  "name": "Containerplan – NORD",
  "short_name": "Lager NORD",
  "start_url": "./nord.html",
- "scope": "./",
+ "scope": "./nord.html",
  "display": "standalone",
  "orientation": "any",
  "background_color": "#ffffff",

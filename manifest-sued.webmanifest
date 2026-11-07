@@ -3,7 +3,7 @@
  "name": "Containerplan – SÜD",
  "short_name": "Lager SÜD",
  "start_url": "./sued.html",
- "scope": "./",
+ "scope": "./sued.html",
  "display": "standalone",
  "orientation": "any",
  "background_color": "#ffffff",
