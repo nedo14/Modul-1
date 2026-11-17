@@ -1,0 +1,33 @@
+name: Supabase keepalive
+
+on:
+  schedule:
+    - cron: '17 6 */3 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ping Supabase
+        run: |
+          curl -fsS -X POST "https://oaquvarnbytnrmdsyrwo.supabase.co/rest/v1/rpc/api_status" \
+            -H "apikey: sb_publishable_S6zpQtrEJWY0c92KMQUDBQ_p5NkfYOc" \
+            -H "Content-Type: application/json" \
+            -d '{}'
+
+      - name: Keep repository active
+        run: |
+          last=$(git log -1 --format=%ct)
+          now=$(date +%s)
+          if [ $((now - last)) -gt $((45*24*3600)) ]; then
+            git config user.name "keepalive"
+            git config user.email "keepalive@users.noreply.github.com"
+            git commit --allow-empty -m "keepalive"
+            git push
+          fi
