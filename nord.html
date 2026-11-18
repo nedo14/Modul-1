@@ -467,6 +467,12 @@ html, body { background: #ffffff !important; color-scheme: light; }
 /* gesperrtes Feld (schwarz) und kein Zoom beim Doppeltippen */
 .position { touch-action: manipulation; }
 .position.blocked { background: #000000 !important; border-color: #000000; }
+
+/* Statistik pro Zug und Datum */
+.summary-table .date-total { font-size: 12px; color: #6a7f8f; font-weight: bold; }
+.summary-table .date-row td { background: #f2f6f9; padding: 5px; font-size: 14px; color: #244c68; border-top: 1px solid #e1e8ed; }
+.summary-table .date-row .date-label { font-size: 14px; }
+.summary-table .date-row .date-count { font-size: 15px; }
 </style>
 </head>
 
@@ -508,12 +514,12 @@ Feld 2 Sekunden gedrückt halten = löschen bzw. Sperre aufheben.
 <div class="summary-wrap">
 <table class="summary-table">
 <thead>
-<tr><th>Zug</th><th>Zeit</th><th>Anzahl Container</th></tr>
+<tr><th>Zug</th><th>Zeit</th><th>Datum</th><th>Anzahl Container</th></tr>
 </thead>
 <tbody id="driverSummary"></tbody>
 <tfoot>
 <tr class="total-row">
-<td colspan="2">SUMME</td>
+<td colspan="3">SUMME</td>
 <td class="number" id="driverGrandTotal">0</td>
 </tr>
 </tfoot>
@@ -951,6 +957,11 @@ document.getElementById("dateSection").style.display = "none";
 function chooseDriver(driver) {
 selectedDriver = driver;
 
+if (driver === "Eingang") {
+acceptDate(todayBerlin());
+return;
+}
+
 document.getElementById("driverSection").style.display = "none";
 document.getElementById("dateSection").style.display = "block";
 
@@ -1133,7 +1144,7 @@ const inside = box.querySelector(".inside");
 inside.innerHTML = "";
 const label = document.createElement("span");
 label.className = "label";
-label.textContent = item.driver + " \u2013 " + formatDate(item.date);
+label.textContent = item.driver === "Eingang" ? "Eingang" : item.driver + " \u2013 " + formatDate(item.date);
 inside.appendChild(label);
 
 let count = box.querySelector(".count");
@@ -1161,9 +1172,11 @@ function updateStats() {
 let occupied = 0;
 let containers = 0;
 const driverCounts = {};
+const dateCounts = {};
 
-summaryDrivers.forEach(driver => {
+summaryDrivers.concat(["Eingang"]).forEach(driver => {
 driverCounts[driver] = 0;
+dateCounts[driver] = {};
 });
 
 Object.keys(data).forEach(key => {
@@ -1176,6 +1189,7 @@ containers += amount;
 
 if (driverCounts[item.driver] !== undefined) {
 driverCounts[item.driver] += amount;
+dateCounts[item.driver][item.date] = (dateCounts[item.driver][item.date] || 0) + amount;
 }
 }
 });
@@ -1191,7 +1205,7 @@ document.getElementById("totalContainers").textContent = containers;
 const summary = document.getElementById("driverSummary");
 summary.innerHTML = "";
 
-summaryDrivers.forEach(driver => {
+summaryDrivers.concat(["Eingang"]).forEach(driver => {
 const tr = document.createElement("tr");
 
 const nameCell = document.createElement("td");
@@ -1202,14 +1216,43 @@ const timeCell = document.createElement("td");
 timeCell.className = "time";
 timeCell.textContent = driverTimes[driver];
 
+const dates = driver === "Eingang" ? [] : Object.keys(dateCounts[driver]).sort();
+
+const labelCell = document.createElement("td");
+labelCell.className = "date-total";
+labelCell.textContent = dates.length ? "gesamt" : "";
+
 const numberCell = document.createElement("td");
 numberCell.className = "number";
 numberCell.textContent = driverCounts[driver];
 
 tr.appendChild(nameCell);
 tr.appendChild(timeCell);
+tr.appendChild(labelCell);
 tr.appendChild(numberCell);
 summary.appendChild(tr);
+
+dates.forEach(dateValue => {
+const dr = document.createElement("tr");
+dr.className = "date-row";
+
+const empty1 = document.createElement("td");
+const empty2 = document.createElement("td");
+
+const dateCell = document.createElement("td");
+dateCell.className = "date-label";
+dateCell.textContent = formatDate(dateValue);
+
+const countCell = document.createElement("td");
+countCell.className = "date-count";
+countCell.textContent = dateCounts[driver][dateValue];
+
+dr.appendChild(empty1);
+dr.appendChild(empty2);
+dr.appendChild(dateCell);
+dr.appendChild(countCell);
+summary.appendChild(dr);
+});
 });
 
 document.getElementById("driverGrandTotal").textContent = containers;
@@ -1405,7 +1448,8 @@ function srv(s) {
   return s.replace(/ zauzetih polja/g, ' belegte Felder').replace(/^Kopija #(\d+): /, 'Kopie #$1: ')
     .replace(/^Prije učitavanja kopije \((.*)\)$/, 'Vor dem Laden einer Kopie ($1)')
     .replace(/^Prije vraćanja kopije #(\d+) \((.*)\)$/, 'Vor dem Wiederherstellen von Kopie #$1 ($2)')
-    .replace(/^Ručna kopija \((.*)\)$/, 'Manuelle Kopie ($1)');
+    .replace(/^Ručna kopija \((.*)\)$/, 'Manuelle Kopie ($1)')
+    .replace(/^Eingang \u2013 \d\d\.\d\d\. /, 'Eingang ');
 }
 const clean = m => srv(String(m || '').replace(/^(AUTH|FORBIDDEN): /, ''));
 const isAuth = e => /^AUTH/.test(String(e && e.message || ''));
@@ -1754,7 +1798,7 @@ async function tabWare(body) {
   rows.sort((a, b) => a[0] - b[0] || a[1].localeCompare(b[1]));
   ALL_RANGES.forEach(r => { const mine = rows.filter(x => x[0] >= r[1] && x[0] <= r[2]); let c = 0; mine.forEach(x => { c += x[2].driver === 'GESPERRT' ? 0 : x[2].count; });
     body.appendChild(h('div', { class: 'sys-card' }, h('strong', null, r[0] + ' (' + r[1] + '–' + r[2] + ')'), h('div', null, 'Belegte Felder: ' + mine.length + ' von ' + (r[2] - r[1] + 1) * 2 + ' · Container: ' + c))); });
-  body.appendChild(table(['Pos.', 'Reihe', 'Zug', 'Datum', 'Größe', 'Anzahl'], rows.map(x => x[2].driver === 'GESPERRT' ? [x[0], x[1], 'GESPERRT', '—', '—', '—'] : [x[0], x[1], x[2].driver, formatDate(x[2].date), x[2].size + ' Fuß', x[2].count + '/' + x[2].max])));
+  body.appendChild(table(['Pos.', 'Reihe', 'Zug', 'Datum', 'Größe', 'Anzahl'], rows.map(x => x[2].driver === 'GESPERRT' ? [x[0], x[1], 'GESPERRT', '—', '—', '—'] : [x[0], x[1], x[2].driver, (x[2].driver === 'Eingang' ? '—' : formatDate(x[2].date)), x[2].size + ' Fuß', x[2].count + '/' + x[2].max])));
 }
 async function tabCorr(body) {
   body.appendChild(h('div', { class: 'sys-note' }, 'Das Original bleibt erhalten. Jede Korrektur erzeugt einen neuen Eintrag (wer, wann, alt, neu, Grund).'));
